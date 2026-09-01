@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>MakeFastQuote — free proposal &amp; invoice generator for freelancers</title>
+    <meta
+      name="description"
+      content="Write a proposal or invoice and download a clean A4 PDF in about two minutes. Free, no sign-up, and nothing you type ever leaves your browser."
+    />
+    <link rel="canonical" href="https://makefastquote.com/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#4338ca" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://makefastquote.com/" />
+    <meta property="og:title" content="Free proposal &amp; invoice generator for freelancers" />
+    <meta
+      property="og:description"
+      content="A clean A4 PDF in two minutes. No sign-up, no upload — it all runs in your browser."
+    />
+    <meta property="og:image" content="https://makefastquote.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "MakeFastQuote",
+        "url": "https://makefastquote.com/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any modern browser",
+        "description": "Proposal and invoice generator for freelancers. Runs entirely in the browser — no account, no upload, no server.",
+        "offers": [
+          { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free" },
+          {
+            "@type": "Offer",
+            "price": "29",
+            "priceCurrency": "USD",
+            "name": "Pro — one-time lifetime unlock"
+          }
+        ]
+      }
+    </script>
+
+    <!--
+      All CSS for the landing page is inlined and there is no render-blocking
+      request, so the first paint is a single round trip. That is most of what
+      a 95+ Lighthouse performance score costs on a page like this — and this
+      page's whole job is being found.
+    -->
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #16181d;
+        --muted: #4d525c;
+        --faint: #6b7280;
+        --surface: #f6f7f9;
+        --panel: #fff;
+        --edge: #dfe3e8;
+        --edge-strong: #8c8f96;
+        --brand: #4338ca;
+        --brand-ink: #fff;
+        --brand-soft: #eef0fe;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --ink: #eceef2;
+          --muted: #b3b9c4;
+          --faint: #9aa1ad;
+          --surface: #0e1014;
+          --panel: #171a20;
+          --edge: #2b303a;
+          --edge-strong: #64666b;
+          --brand: #a5b4fc;
+          --brand-ink: #10121a;
+          --brand-soft: #232739;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--surface);
+        color: var(--ink);
+        font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica,
+          Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 64rem;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+      }
+      header {
+        border-bottom: 1px solid var(--edge);
+        background: var(--panel);
+      }
+      .bar {
+        height: 3.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      .mark {
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 0.5rem;
+        background: var(--brand);
+        color: var(--brand-ink);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 0.875rem;
+      }
+      .brand {
+        font-weight: 700;
+        font-size: 0.9375rem;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        border-radius: 0.5rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        padding: 0.7rem 1.15rem;
+        border: 1px solid transparent;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: var(--brand);
+        color: var(--brand-ink);
+      }
+      .btn-ghost {
+        border-color: var(--edge-strong);
+        color: var(--ink);
+      }
+      .btn:focus-visible {
+        outline: 2px solid var(--brand);
+        outline-offset: 2px;
+      }
+      h1 {
+        font-size: clamp(2rem, 5.2vw, 3.1rem);
+        line-height: 1.1;
+        letter-spacing: -0.022em;
+        margin: 0 0 1rem;
+        max-width: 18ch;
+      }
+      .lede {
+        font-size: 1.125rem;
+        color: var(--muted);
+        max-width: 46ch;
+        margin: 0 0 1.75rem;
+      }
+      section {
+        padding: 3.5rem 0;
+      }
+      .hero {
+        padding: 4rem 0 3rem;
+      }
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+      }
+      .note {
+        font-size: 0.8125rem;
+        color: var(--faint);
+        margin: 0.9rem 0 0;
+      }
+      h2 {
+        font-size: 1.5rem;
+        letter-spacing: -0.015em;
+        margin: 0 0 1.5rem;
+      }
+      .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--edge);
+        border-radius: 0.75rem;
+        padding: 1.15rem;
+      }
+      .card h3 {
+        margin: 0 0 0.4rem;
+        font-size: 1rem;
+      }
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9375rem;
+      }
+      .price {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+        align-items: start;
+      }
+      .tier {
+        background: var(--panel);
+        border: 1px solid var(--edge);
+        border-radius: 0.9rem;
+        padding: 1.5rem;
+      }
+      .tier.pro {
+        border-color: var(--brand);
+      }
+      .tier h3 {
+        margin: 0;
+        font-size: 1.0625rem;
+      }
+      .amount {
+        font-size: 2.25rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0.5rem 0 0.15rem;
+      }
+      .per {
+        color: var(--faint);
+        font-size: 0.8125rem;
+        margin: 0 0 1rem;
+      }
+      ul.ticks {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1.25rem;
+        display: grid;
+        gap: 0.55rem;
+      }
+      ul.ticks li {
+        padding-left: 1.5rem;
+        position: relative;
+        color: var(--muted);
+        font-size: 0.9375rem;
+      }
+      ul.ticks li::before {
+        content: '';
+        position: absolute;
+        left: 0.1rem;
+        top: 0.55rem;
+        width: 0.55rem;
+        height: 0.3rem;
+        border-left: 2px solid var(--brand);
+        border-bottom: 2px solid var(--brand);
+        transform: rotate(-45deg);
+      }
+      details {
+        border-top: 1px solid var(--edge);
+        padding: 1rem 0;
+      }
+      details summary {
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      details p {
+        color: var(--muted);
+        margin: 0.65rem 0 0;
+        max-width: 62ch;
+      }
+      footer {
+        border-top: 1px solid var(--edge);
+        padding: 2rem 0 3rem;
+        color: var(--faint);
+        font-size: 0.875rem;
+      }
+      .privacy {
+        background: var(--brand-soft);
+        border: 1px solid var(--edge);
+        border-radius: 0.9rem;
+        padding: 1.5rem;
+      }
+      .privacy p {
+        margin: 0.5rem 0 0;
+        color: var(--muted);
+        max-width: 60ch;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap bar">
+        <span class="mark" aria-hidden="true">Q</span>
+        <span class="brand">makefastquote.com</span>
+        <a class="btn btn-primary" href="/app/" style="margin-left: auto; padding: 0.5rem 0.9rem"
+          >Open the editor</a
+        >
+      </div>
+    </header>
+
+    <main>
+      <section class="wrap hero">
+        <h1>Proposals and invoices that look like a real business sent them.</h1>
+        <p class="lede">
+          Fill in a form, watch an A4 page build itself next to you, download the PDF. About two
+          minutes, no sign-up, and nothing you type ever leaves your browser.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="/app/">Make one now — free</a>
+          <a class="btn btn-ghost" href="#pricing">See what Pro adds</a>
+        </div>
+        <p class="note">
+          Free covers unlimited documents and real PDF export. Pro is a one-time $29.
+        </p>
+      </section>
+
+      <section class="wrap">
+        <h2>What you get</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>A preview you can trust</h3>
+            <p>
+              The page on the right is drawn from the same model that builds the PDF, so the file
+              you download is the page you were looking at.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Real, searchable text</h3>
+            <p>
+              Not a screenshot of a document. Your client can select the reference number and copy
+              your bank details, and the file is tens of kilobytes.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Line items that add up</h3>
+            <p>
+              Per-row tax rates, a discount, and totals computed in whole cents so the printed total
+              always matches the printed rows.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Sign it yourself</h3>
+            <p>Draw your signature with a mouse, a finger or a stylus. It goes on the page as
+              vector strokes, not a blurry image.</p>
+          </div>
+          <div class="card">
+            <h3>It remembers</h3>
+            <p>
+              Your details, your client, your last document — all still there when you come back
+              tomorrow. Stored on your device, not ours.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Your data stays yours</h3>
+            <p>
+              Export everything to CSV or JSON whenever you like, free, whether or not you ever
+              buy Pro.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="wrap">
+        <div class="privacy">
+          <h2 style="margin-bottom: 0">Nothing you type is sent anywhere</h2>
+          <p>
+            This is not a promise about how carefully we handle your data — it is a fact about how
+            the site is built. There is no server, no database and no account. The whole tool is a
+            file your browser downloads once and then runs on its own; your client list and your
+            rates never travel. You can check: open the network tab and make a document.
+          </p>
+        </div>
+      </section>
+
+      <section class="wrap" id="pricing">
+        <h2>Pricing</h2>
+        <div class="price">
+          <div class="tier">
+            <h3>Free</h3>
+            <p class="amount">$0</p>
+            <p class="per">Genuinely, not a trial</p>
+            <ul class="ticks">
+              <li>Unlimited proposals and invoices</li>
+              <li>A4 PDF export with real text</li>
+              <li>Signature, tax rates, discounts, multi-page</li>
+              <li>CSV and JSON export of your data</li>
+              <li>A small credit line in the footer</li>
+            </ul>
+            <a class="btn btn-ghost" href="/app/">Start free</a>
+          </div>
+          <div class="tier pro">
+            <h3>Pro</h3>
+            <p class="amount">$29</p>
+            <p class="per">Once. Not a subscription.</p>
+            <ul class="ticks">
+              <li>Your logo in the header of every document</li>
+              <li>Three studio templates — Modern, Minimalist, Classic</li>
+              <li>No footer credit; the page is yours end to end</li>
+              <li>Everything in Free, forever</li>
+            </ul>
+            <a class="btn btn-primary" href="/app/?upgrade=1">Unlock Pro — $29</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="wrap">
+        <h2>Questions</h2>
+        <details>
+          <summary>Do I need an account?</summary>
+          <p>
+            No. There is nowhere to sign up, because there is no server to sign up to. Open the
+            editor and start typing.
+          </p>
+        </details>
+        <details>
+          <summary>Where are my documents stored?</summary>
+          <p>
+            In your browser, on the device you are using. That means they survive a refresh and are
+            waiting for you tomorrow — but they do not follow you to another computer, and clearing
+            your browser data clears them. Export to CSV or JSON if you want a copy you keep.
+          </p>
+        </details>
+        <details>
+          <summary>What does Pro actually change?</summary>
+          <p>
+            Your logo goes in the header, three more templates unlock, and the small credit line in
+            the footer comes off. Everything else — unlimited documents, PDF export, tax, discounts,
+            signatures — is in the free version and stays there.
+          </p>
+        </details>
+        <details>
+          <summary>Is $29 really one payment?</summary>
+          <p>
+            Yes. One payment, no renewal, no card kept on file. You get a code by email; paste it in
+            once and this browser is unlocked.
+          </p>
+        </details>
+        <details>
+          <summary>Can I use it for client work in any currency?</summary>
+          <p>
+            Ten currencies are built in, and per-line tax rates cover VAT, GST and sales tax. The
+            PDF font covers Latin-script languages; if you need Hebrew, Arabic or CJK, it is not
+            there yet.
+          </p>
+        </details>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <p style="margin: 0">
+          makefastquote.com — a free proposal and invoice generator that runs entirely in your
+          browser.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

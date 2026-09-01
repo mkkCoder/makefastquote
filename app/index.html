@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Editor · MakeFastQuote</title>
+    <meta name="description" content="Build a proposal or invoice and download it as a clean A4 PDF. Everything happens in your browser." />
+    <!-- The editor is a tool, not a landing page: keep it out of the index and
+         point crawlers at the page that should rank. -->
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href="https://makefastquote.com/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#4338ca" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <p style="font-family: system-ui; padding: 2rem; max-width: 40rem; margin: 0 auto">
+        The editor needs JavaScript to run — it does all its work in your browser rather than on a
+        server, which is also why none of your data ever leaves this device.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

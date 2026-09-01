@@ -1,0 +1,212 @@
+@import 'tailwindcss';
+
+/*
+ * Colour is defined once, as CSS variables, in both themes. Tailwind utilities
+ * reference the variables rather than hard-coded palette values, so the dark
+ * theme is a redefinition rather than a second set of class names sprinkled
+ * through every component.
+ *
+ * Every pair below is checked against WCAG AA by `npm run audit:contrast`,
+ * which fails the build if a pair regresses. A brand colour that fails AA on
+ * the panel background is very easy to ship and embarrassing to be told about.
+ *
+ * TWO BORDER TOKENS, ON PURPOSE:
+ *   --edge         decorative separators — card outlines, rules between
+ *                  sections. WCAG 1.4.11 does not apply: nothing about
+ *                  identifying or operating a control depends on seeing them,
+ *                  so they stay as light as the design wants.
+ *   --edge-strong  the visible boundary of an interactive control — text
+ *                  inputs, selects, outline buttons. Here the border IS the
+ *                  affordance: it is what tells you the box is a box you can
+ *                  type in, so it must clear 3:1 against every surface it sits
+ *                  on. The audit enforces that and does not enforce it on
+ *                  --edge. Do not "fix" a failing audit by swapping a control
+ *                  back to --edge.
+ */
+
+@theme {
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-edge: var(--edge);
+  --color-edge-strong: var(--edge-strong);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    'Liberation Sans', sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  --ink: #16181d;
+  --muted: #4d525c;
+  --faint: #6b7280;
+  --surface: #f6f7f9;
+  --panel: #ffffff;
+  --edge: #dfe3e8;
+  --edge-strong: #8c8f96;
+  --brand: #4338ca;
+  --brand-ink: #ffffff;
+  --brand-soft: #eef0fe;
+  --accent: #0f766e;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --ink: #eceef2;
+  --muted: #b3b9c4;
+  --faint: #9aa1ad;
+  --surface: #0e1014;
+  --panel: #171a20;
+  --edge: #2b303a;
+  --edge-strong: #64666b;
+  --brand: #a5b4fc;
+  --brand-ink: #10121a;
+  --brand-soft: #232739;
+  --accent: #5eead4;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme='light']) {
+    color-scheme: dark;
+    --ink: #eceef2;
+    --muted: #b3b9c4;
+    --faint: #9aa1ad;
+    --surface: #0e1014;
+    --panel: #171a20;
+    --edge: #2b303a;
+    --edge-strong: #64666b;
+    --brand: #a5b4fc;
+    --brand-ink: #10121a;
+    --brand-soft: #232739;
+    --accent: #5eead4;
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Component classes live in Tailwind's `components` layer, NOT at the top
+ * level of the stylesheet.
+ *
+ * WHY THIS MATTERS: an unlayered `.btn { display: inline-flex }` has the same
+ * specificity as Tailwind's `.hidden` utility, and because it is defined later
+ * in the file it wins. The symptom is that every responsive utility silently
+ * stops working on these components — `hidden sm:inline-flex` on a button just
+ * does nothing, and the mobile header wraps into a broken two-line mess. It
+ * looks like a Tailwind bug and it is a cascade-order bug.
+ *
+ * Inside @layer components, utilities always win, which is what you want:
+ * the class defines the look, the utility overrides it at a breakpoint.
+ */
+@layer components {
+  /* Inputs are styled once here rather than repeating a dozen utilities per
+     field, which is what makes the form markup readable. */
+  .field {
+    width: 100%;
+    background: var(--panel);
+    color: var(--ink);
+    border: 1px solid var(--edge-strong);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.625rem;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 28%, transparent);
+  }
+  .field::placeholder {
+    color: var(--faint);
+  }
+
+  .label {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 0.3rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 120ms ease, border-color 120ms ease, transform 60ms ease;
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+  .btn-primary {
+    background: var(--brand);
+    color: var(--brand-ink);
+  }
+  .btn-primary:hover {
+    background: color-mix(in srgb, var(--brand) 88%, black);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--edge-strong);
+  }
+  .btn-ghost:hover {
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+  }
+
+  /* The A4 sheet. aspect-ratio keeps it true to scale at any width, so the
+     preview is genuinely the page rather than an approximation of it. */
+  .sheet {
+    aspect-ratio: 210 / 297;
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.08), 0 12px 28px rgb(0 0 0 / 0.12);
+    overflow: hidden;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Respect a user who has asked the OS for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

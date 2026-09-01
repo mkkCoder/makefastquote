@@ -1,0 +1,77 @@
+name: Build and deploy
+
+on:
+  push:
+    # `git init` leaves you on `master`. If this repo is ever pushed from a
+    # branch this workflow does not watch, no run is created and the deploy
+    # silently never happens — run `git branch -M main` before the first push.
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let an in-flight deploy finish rather than cancelling it half-published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  # TRAP: `playwright` is a devDependency, so a plain `npm ci` downloads ~400 MB
+  # of browsers on every single run. CI runs the unit tests and the build, not
+  # the browser suite (that is `npm run e2e`, run locally), so skip the
+  # download. Removing this line adds minutes to every job for no benefit.
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # These are the exact commands to run locally before pushing. Not a
+      # narrower version you believe is equivalent: `eslint .` and
+      # `eslint src --ext .ts,.tsx` cover different files and fail on different
+      # things, and only the first one gates this deploy.
+      - name: No literal invisible characters
+        run: npm run check:invisible
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc -b
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build (includes the bundle budget)
+        run: npm run build
+
+      - name: Colour contrast audit
+        run: npm run audit:contrast
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # This step fails until Settings → Pages → Source is set to
+      # "GitHub Actions". It is not something the workflow can do for you.
+      - id: deployment
+        uses: actions/deploy-pages@v4

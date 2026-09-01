@@ -57,8 +57,8 @@ export const LICENSE_VENDOR = {
 /**
  * Lemon Squeezy overlay checkout URL.
  *
- * SET THIS BEFORE LAUNCH. Until it contains a real store URL the buy button
- * falls back to the "how to buy" panel instead of opening a broken checkout.
+ * When empty, the buy button falls back to a "not connected yet" note instead
+ * of opening a broken checkout.
  * Format: https://<store>.lemonsqueezy.com/checkout/buy/<variant-id>
  *
  * Note `/checkout/buy/`, not `/buy/`. Lemon Squeezy's docs are explicit that
@@ -67,7 +67,7 @@ export const LICENSE_VENDOR = {
  * Opening such a URL converts it into a single-use cart URL, which is normal
  * and is why the link you land on does not match the one you configured.
  */
-export const CHECKOUT_URL = '';
+export const CHECKOUT_URL = 'https://tik-tak.lemonsqueezy.com/checkout/buy/8a21f375-6a53-4083-9632-e1c4471f9c84';
 
 /** Loaded lazily; only ever fetched when someone actually opens the buy flow. */
 export const LEMON_JS_URL = 'https://assets.lemonsqueezy.com/lemon.js';

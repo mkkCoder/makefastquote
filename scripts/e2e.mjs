@@ -540,6 +540,14 @@ await check('a Pro template opens the upgrade modal instead of applying', async 
     await page.locator('[data-testid="template-modern"]').click();
     await page.locator('[role="dialog"]').waitFor({ state: 'visible' });
 
+    // Checkout must be wired: with CHECKOUT_URL empty the modal quietly shows
+    // a "not connected yet" note instead of a buy button, which is easy to
+    // ship and means nobody can pay.
+    assert(
+      (await page.locator('[data-testid="buy-button"]').count()) === 1,
+      'no buy button — CHECKOUT_URL is not set in src/config.ts',
+    );
+
     // The document must NOT have switched to the locked template.
     const stored = await page.evaluate(() => localStorage.getItem('mfq.document.v1'));
     assert(!stored || JSON.parse(stored).template !== 'modern', 'locked template was applied');

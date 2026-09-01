@@ -1,5 +1,14 @@
 import { create } from 'zustand';
-import type { DocKind, DocumentState, LicenseState, LineItem, Party, Stroke, TemplateId } from './types';
+import type {
+  DocKind,
+  DocumentState,
+  LicenseState,
+  LineItem,
+  Party,
+  SignatureImage,
+  Stroke,
+  TemplateId,
+} from './types';
 import { defaultDocument, loadDocument, newItem, saveDocument, clearDocument } from './lib/persist';
 import { emptyLicense, loadLicense, saveLicense, clearLicense } from './lib/license';
 import { TEMPLATES } from './pdf/templates';
@@ -21,6 +30,7 @@ interface AppState {
   removeItem: (id: string) => void;
   moveItem: (id: string, delta: number) => void;
   setSignature: (strokes: Stroke[]) => void;
+  setSignatureImage: (image: SignatureImage | null) => void;
   setLogo: (dataUrl: string | null) => void;
 
   openUpgrade: (reason: string) => void;
@@ -134,9 +144,22 @@ export const useApp = create<AppState>((set, get) => {
     },
 
     setSignature: (signature) => {
-      const next = { ...get().doc, signature };
+      // Drawing clears an uploaded signature: the document has one signature
+      // line, and keeping both would silently discard whichever the layout
+      // happens not to prefer.
+      const next = { ...get().doc, signature, signatureImage: null };
       set({ doc: next });
       scheduleSave(next);
+    },
+
+    setSignatureImage: (signatureImage) => {
+      // ...and the reverse. Uploading replaces whatever was drawn.
+      const next = { ...get().doc, signatureImage, signature: [] };
+      set({ doc: next });
+      // Written immediately: this follows an explicit file pick, and a base64
+      // PNG is the one payload where losing the debounce window would cost the
+      // user a re-upload rather than a keystroke.
+      flushSave(next);
     },
 
     setLogo: (logo) => {

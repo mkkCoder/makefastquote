@@ -121,6 +121,45 @@ That is what lets one signature draw correctly into a 62 mm PDF box, a scaled
 preview and a resized canvas. Pixel-space storage distorts the moment a
 breakpoint changes.
 
+### Signature import
+
+**Ink/paper separation uses Otsu's method, not percentiles.** The first version
+took "the darkest 4% of pixels" as ink. That breaks on the most ordinary input
+there is — a signature photographed on a full sheet, where the ink is one or two
+percent of the image. The percentile lands in the paper, ink and paper come out
+identical, and a perfectly good photograph is rejected with "no signature
+found". Lowering the percentile only moves the cliff. Otsu separates two classes
+whatever their relative sizes. Pinned by "finds a small signature on a large
+sheet" in `src/test/signature.test.ts`.
+
+**Fully transparent pixels are flooded with the average ink colour.** Two
+reasons, both learned the hard way. Leaving the paper's original RGB behind
+alpha=0 means PNG still encodes the entire shadow gradient it can no longer
+show — the output ran to several hundred kilobytes and tripped the size guard,
+so imports failed outright. And flooding with black or white instead of the ink
+colour produces a halo: renderers that interpolate in straight alpha pull
+neighbouring RGB into the soft edge of the stroke, and a white fringe around
+handwriting is exactly what makes a signature look pasted on.
+
+**The signature image is fitted to its box in `layout.ts`, not by the
+renderers.** SVG's `preserveAspectRatio` and jsPDF's `addImage` do not letterbox
+identically, so leaving the fit to them makes the preview and the PDF disagree
+about where the signature sits.
+
+**An uploaded signature and drawn strokes are mutually exclusive**, enforced in
+the store rather than the layout. The document has one signature line; keeping
+both would silently discard whichever the layout happens not to prefer.
+
+**`SignatureImportError` is not logged to the console.** A blank page or a
+no-contrast photo is a handled outcome shown to the user, not a bug. Logging it
+as an error trains people to ignore the console — and the e2e suite fails any
+check that produces a console error, so it would also break the build.
+
+**The preview uses an absolute `max-h-24`, not `max-h-full`.** A percentage
+height inside an auto-sized grid row resolves against a track sized by its own
+content, which browsers treat as `none` — the signature grew out of its frame
+and printed over the caption beneath it.
+
 ### The licence gate
 
 **It is client-side and bypassable in about ten minutes with a console.** That

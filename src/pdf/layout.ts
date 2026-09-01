@@ -404,7 +404,35 @@ export function layoutDocument({ doc, isPro }: LayoutInput): LayoutResult {
 
   const sigX = PAGE.w - MARGIN.right - 62;
   const sigBox = { x: sigX, y: y + 2, w: 62, h: sigBoxH };
-  if (doc.signature.length > 0) {
+
+  if (doc.signatureImage) {
+    // An uploaded signature wins over drawn strokes — the form only lets one
+    // be active, and honouring both would stack two signatures on the line.
+    //
+    // Fitted by hand rather than left to the renderer: SVG's preserveAspectRatio
+    // and jsPDF's addImage do NOT agree about how to letterbox an image into a
+    // box, so leaving it to them makes the preview and the PDF disagree about
+    // where the signature sits. Computing the exact rectangle here means both
+    // renderers are just told where to put it.
+    const aspect = Number.isFinite(doc.signatureImage.aspect) && doc.signatureImage.aspect > 0
+      ? doc.signatureImage.aspect
+      : 1;
+    let iw = sigBox.w;
+    let ih = iw / aspect;
+    if (ih > sigBox.h) {
+      ih = sigBox.h;
+      iw = ih * aspect;
+    }
+    ops.push({
+      t: 'image',
+      // Centred over the line, and sitting ON it rather than floating.
+      x: sigBox.x + (sigBox.w - iw) / 2,
+      y: sigBox.y + (sigBox.h - ih),
+      w: iw,
+      h: ih,
+      src: doc.signatureImage.src,
+    });
+  } else if (doc.signature.length > 0) {
     for (const stroke of doc.signature) {
       if (stroke.length < 2) continue;
       ops.push({

@@ -74,6 +74,7 @@ export function FormPanel() {
   const patchDoc = useApp((s) => s.patchDoc);
   const patchParty = useApp((s) => s.patchParty);
   const setSignature = useApp((s) => s.setSignature);
+  const setSignatureImage = useApp((s) => s.setSignatureImage);
   const setLogo = useApp((s) => s.setLogo);
   const openUpgrade = useApp((s) => s.openUpgrade);
   const fileRef = useRef<HTMLInputElement | null>(null);
@@ -286,7 +287,12 @@ export function FormPanel() {
       </Section>
 
       <Section title="Signature">
-        <SignaturePad strokes={doc.signature} onChange={setSignature} />
+        <SignaturePad
+          strokes={doc.signature}
+          onChange={setSignature}
+          image={doc.signatureImage}
+          onImageChange={setSignatureImage}
+        />
         <div className="mt-3">
           <Field
             label="Printed name under the line"

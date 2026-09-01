@@ -63,9 +63,11 @@ export function toJson(doc: DocumentState): string {
   return JSON.stringify(
     {
       ...doc,
-      // Signature strokes are geometry, not data anyone wants in a backup, and
-      // they make the file enormous. The rest round-trips.
+      // Signature strokes are geometry, and an uploaded signature is a base64
+      // PNG — neither is data anyone wants in a backup, and together they make
+      // the file enormous. The rest round-trips.
       signature: undefined,
+      signatureImage: undefined,
       computed: {
         subtotalMinor: totals.subtotal,
         discountMinor: totals.discount,

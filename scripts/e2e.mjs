@@ -99,6 +99,9 @@ async function waitFor(fn, { timeout = 5000, interval = 50, what = 'condition' }
 
 const KEY = '38b1460a-5104-4067-a91d-77b872934d51';
 
+/** 64x64 solid white — used to prove a blank page is refused, not guessed at. */
+const BLANK_PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAS0lEQVR42u3PMQ0AAAwDoPo33UrYvQQckD4XAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAYHLAMpT0sIcNbcEAAAAAElFTkSuQmCC';
+
 /**
  * PLAYWRIGHT_CHROMIUM_PATH lets a sandbox or CI image supply its own Chromium
  * instead of having Playwright download one. Playwright pins an exact browser
@@ -392,6 +395,140 @@ await check('a signature survives a refresh taken right after drawing', async ()
     );
     assert(svg.includes('<polyline'), 'signature lost across reload');
     await page.screenshot({ path: join(shots, '07-signature.png') });
+  });
+  assertNoConsoleErrors(errors);
+});
+
+// ── 7b. importing a signature from a photo ─────────────────────────────────
+await check('an uploaded signature photo lands on the document, background removed', async () => {
+  const errors = await withPage(async (page) => {
+    await page.goto(`${origin}/app/`, { waitUntil: 'load' });
+
+    await page.locator('[data-testid="signature-upload"]').click();
+    await page
+      .locator('[data-testid="signature-file"]')
+      .setInputFiles(resolve(here, '../src/test/fixtures-signature.png'));
+
+    // The processed preview must appear, and it must be a PNG — a JPEG would
+    // have put the paper background straight back.
+    const src = await waitFor(
+      async () => {
+        const el = page.locator('[data-testid="signature-image"]');
+        return (await el.count()) ? await el.getAttribute('src') : null;
+      },
+      { what: 'the processed signature to appear', timeout: 15000 },
+    );
+    assert(src.startsWith('data:image/png'), `signature is not a PNG: ${src.slice(0, 30)}`);
+
+    // The background really is transparent: sample the corner of the decoded
+    // image. Asserting "an image appeared" would pass on an opaque rectangle,
+    // which is precisely the bug this feature exists to avoid.
+    const cornerAlpha = await page.evaluate(async (dataUrl) => {
+      const img = new Image();
+      await new Promise((r) => {
+        img.onload = r;
+        img.src = dataUrl;
+      });
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      return ctx.getImageData(0, 0, 1, 1).data[3];
+    }, src);
+    assert(cornerAlpha === 0, `the paper was not removed — corner alpha is ${cornerAlpha}`);
+
+    // And it reaches the actual document, not just the form.
+    const svg = await waitFor(
+      async () => {
+        const s = await page.locator('[data-testid="preview-page-1"] svg').innerHTML();
+        return s.includes('<image') ? s : null;
+      },
+      { what: 'the signature to reach the preview' },
+    );
+    assert(svg.includes('<image'), 'signature image missing from the document');
+
+    // The preview must stay inside its frame. A percentage max-height in an
+    // auto-sized grid row silently resolves to `none`, and the signature grew
+    // out of the box and over the caption — visible in a screenshot, invisible
+    // to any assertion that only checks the image exists.
+    const overflow = await page.evaluate(() => {
+      const img = document.querySelector('[data-testid="signature-image"]');
+      const frame = img.parentElement;
+      const a = img.getBoundingClientRect();
+      const b = frame.getBoundingClientRect();
+      return { over: Math.round(a.bottom - b.bottom), right: Math.round(a.right - b.right) };
+    });
+    assert(overflow.over <= 1, `signature overflows its frame by ${overflow.over}px`);
+    assert(overflow.right <= 1, `signature overflows its frame by ${overflow.right}px sideways`);
+
+    // And it survives into the actual PDF as an embedded image.
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.locator('[data-testid="download-pdf"]').click(),
+    ]);
+    const bytes = await readFile(await download.path());
+    assert(bytes.subarray(0, 5).toString() === '%PDF-', 'not a PDF');
+    const body = bytes.toString('latin1');
+    assert(body.includes('/Image'), 'the PDF has no embedded image — the signature was dropped');
+
+    await page.screenshot({ path: join(shots, '07b-signature-upload.png') });
+  });
+  assertNoConsoleErrors(errors);
+});
+
+await check('uploading replaces a drawn signature rather than stacking both', async () => {
+  const errors = await withPage(async (page) => {
+    await page.goto(`${origin}/app/`, { waitUntil: 'load' });
+    const canvas = page.locator('[data-testid="signature-canvas"]');
+    await canvas.scrollIntoViewIfNeeded();
+    const box = await canvas.boundingBox();
+    await page.mouse.move(box.x + 15, box.y + 60);
+    await page.mouse.down();
+    for (let i = 1; i <= 8; i++) await page.mouse.move(box.x + 15 + i * 20, box.y + 40 + i * 3);
+    await page.mouse.up();
+
+    await waitFor(
+      async () => {
+        const s = await page.locator('[data-testid="preview-page-1"] svg').innerHTML();
+        return s.includes('<polyline') ? true : null;
+      },
+      { what: 'the drawn signature to reach the document' },
+    );
+
+    await page.locator('[data-testid="signature-upload"]').click();
+    await page
+      .locator('[data-testid="signature-file"]')
+      .setInputFiles(resolve(here, '../src/test/fixtures-signature.png'));
+
+    const svg = await waitFor(
+      async () => {
+        const s = await page.locator('[data-testid="preview-page-1"] svg').innerHTML();
+        return s.includes('<image') ? s : null;
+      },
+      { what: 'the uploaded signature to take over', timeout: 15000 },
+    );
+    // One signature line, one signature.
+    assert(!svg.includes('<polyline'), 'the drawn strokes are still on the document too');
+  });
+  assertNoConsoleErrors(errors);
+});
+
+await check('a photo with no signature in it is refused with a readable reason', async () => {
+  const errors = await withPage(async (page) => {
+    await page.goto(`${origin}/app/`, { waitUntil: 'load' });
+    await page.locator('[data-testid="signature-upload"]').click();
+    // A blank white square — no ink to find.
+    await page.locator('[data-testid="signature-file"]').setInputFiles({
+      name: 'blank.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from(BLANK_PNG_BASE64, 'base64'),
+    });
+    const msg = await page.locator('[data-testid="signature-error"]').textContent();
+    assert(/no signature found/i.test(msg ?? ''), `unhelpful error: ${msg}`);
+    // And nothing was written to the document.
+    const svg = await page.locator('[data-testid="preview-page-1"] svg').innerHTML();
+    assert(!svg.includes('<image'), 'a failed import still put something on the page');
   });
   assertNoConsoleErrors(errors);
 });

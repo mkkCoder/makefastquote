@@ -62,6 +62,36 @@ describe('migrateDocument', () => {
   it('rejects an unknown template rather than rendering nothing', () => {
     expect(migrateDocument({ template: 'neon' }).doc.template).toBe('standard');
   });
+
+  it('keeps a well-formed uploaded signature', () => {
+    const img = { src: 'data:image/png;base64,AAAA', aspect: 3.5 };
+    expect(migrateDocument({ signatureImage: img }).doc.signatureImage).toEqual(img);
+  });
+
+  it('drops an uploaded signature whose src is not an image data URL', () => {
+    // It is handed straight to an <image href>; a javascript: URL must not
+    // survive a round-trip through storage.
+    expect(
+      migrateDocument({ signatureImage: { src: 'javascript:alert(1)', aspect: 2 } }).doc
+        .signatureImage,
+    ).toBeNull();
+  });
+
+  it('drops an uploaded signature with an unusable aspect ratio', () => {
+    // The layout divides by it.
+    for (const aspect of [0, -1, 'wide', undefined, Number.NaN]) {
+      expect(
+        migrateDocument({ signatureImage: { src: 'data:image/png;base64,AA', aspect } }).doc
+          .signatureImage,
+      ).toBeNull();
+    }
+  });
+
+  it('tolerates a signatureImage that is not an object at all', () => {
+    for (const v of ['x', 42, [], null]) {
+      expect(migrateDocument({ signatureImage: v }).doc.signatureImage).toBeNull();
+    }
+  });
 });
 
 describe('loadDocument', () => {

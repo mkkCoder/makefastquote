@@ -1,4 +1,4 @@
-import type { DocumentState, LineItem, Party, Stroke } from '../types';
+import type { DocumentState, LineItem, Party, SignatureImage, Stroke } from '../types';
 import { DOC_SCHEMA_VERSION, STORAGE_KEYS } from '../config';
 
 const emptyParty = (): Party => ({ name: '', contact: '', email: '', phone: '', address: '' });
@@ -35,6 +35,7 @@ export function defaultDocument(): DocumentState {
     discount: 0,
     logo: null,
     signature: [],
+    signatureImage: null,
     signatureName: '',
   };
 }
@@ -52,6 +53,22 @@ function coerceParty(v: unknown): Party {
     phone: str(o.phone),
     address: str(o.address),
   };
+}
+
+/**
+ * An uploaded signature only survives if it is genuinely an image data URL and
+ * carries a usable aspect ratio. A stored `javascript:` URL would otherwise be
+ * handed straight to an <image href>, and a missing ratio would divide by zero
+ * in the layout.
+ */
+function coerceSignatureImage(v: unknown): SignatureImage | null {
+  if (typeof v !== 'object' || v === null) return null;
+  const o = v as Record<string, unknown>;
+  const src = typeof o.src === 'string' && o.src.startsWith('data:image/') ? o.src : null;
+  const aspect = typeof o.aspect === 'number' && Number.isFinite(o.aspect) && o.aspect > 0
+    ? o.aspect
+    : null;
+  return src && aspect ? { src, aspect } : null;
 }
 
 function coerceStrokes(v: unknown): Stroke[] {
@@ -128,6 +145,7 @@ export function migrateDocument(raw: unknown): { doc: DocumentState; changed: bo
     discount: Math.min(100, Math.max(0, num(o.discount))),
     logo,
     signature: coerceStrokes(o.signature),
+    signatureImage: coerceSignatureImage(o.signatureImage),
     signatureName: str(o.signatureName),
   };
 

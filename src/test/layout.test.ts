@@ -161,6 +161,73 @@ describe('signature', () => {
   });
 });
 
+describe('an uploaded signature', () => {
+  const img = { src: 'data:image/png;base64,AAAA', aspect: 4 };
+
+  it('is drawn as an image inside the signature box', () => {
+    const { pages } = layoutDocument({ doc: doc({ signatureImage: img }), isPro: false });
+    const ops = allOps(pages).filter(
+      (o): o is Extract<Op, { t: 'image' }> => o.t === 'image',
+    );
+    expect(ops).toHaveLength(1);
+    const op = ops[0]!;
+    expect(op.x).toBeGreaterThanOrEqual(PAGE.w - MARGIN.right - 62 - 0.01);
+    expect(op.x + op.w).toBeLessThanOrEqual(PAGE.w - MARGIN.right + 0.01);
+    expect(op.y + op.h).toBeLessThanOrEqual(PAGE.h - MARGIN.bottom);
+  });
+
+  it('is fitted to its aspect ratio rather than stretched', () => {
+    for (const aspect of [0.4, 1, 4, 12]) {
+      const { pages } = layoutDocument({
+        doc: doc({ signatureImage: { ...img, aspect } }),
+        isPro: false,
+      });
+      const op = allOps(pages).find(
+        (o): o is Extract<Op, { t: 'image' }> => o.t === 'image',
+      )!;
+      // Fitted here, not by the renderers: SVG's preserveAspectRatio and
+      // jsPDF's addImage letterbox differently, so leaving it to them makes
+      // the preview and the PDF disagree.
+      expect(op.w / op.h).toBeCloseTo(aspect, 5);
+      expect(op.w).toBeLessThanOrEqual(62 + 0.01);
+    }
+  });
+
+  it('takes precedence over drawn strokes, and only one is drawn', () => {
+    const { pages } = layoutDocument({
+      doc: doc({
+        signatureImage: img,
+        signature: [
+          [
+            [0, 0],
+            [1, 1],
+          ],
+        ],
+      }),
+      isPro: false,
+    });
+    const ops = allOps(pages);
+    expect(ops.some((o) => o.t === 'image')).toBe(true);
+    expect(ops.some((o) => o.t === 'path')).toBe(false);
+  });
+
+  it('never divides by zero on a corrupt aspect ratio', () => {
+    for (const aspect of [0, -3, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const { pages } = layoutDocument({
+        doc: doc({ signatureImage: { ...img, aspect } }),
+        isPro: false,
+      });
+      const op = allOps(pages).find(
+        (o): o is Extract<Op, { t: 'image' }> => o.t === 'image',
+      )!;
+      expect(Number.isFinite(op.w)).toBe(true);
+      expect(Number.isFinite(op.h)).toBe(true);
+      expect(op.w).toBeGreaterThan(0);
+      expect(op.h).toBeGreaterThan(0);
+    }
+  });
+});
+
 describe('templates', () => {
   it('produces a complete document for every template', () => {
     for (const template of ['standard', 'modern', 'minimalist', 'classic'] as const) {

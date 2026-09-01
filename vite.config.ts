@@ -9,9 +9,20 @@ import { fileURLToPath } from 'node:url';
 
 const root = dirname(fileURLToPath(import.meta.url));
 
-// Base path is a single variable so moving between an apex domain and a
-// project subpath (username.github.io/makefastquote/) is a one-line change.
-const base = process.env.VITE_BASE ?? '/';
+// Relative base by default, so the SAME build works at an apex domain
+// (makefastquote.com/) and at a project subpath
+// (mkkcoder.github.io/makefastquote/) with no rebuild.
+//
+// An absolute base of '/' emits <script src="/assets/app.js">, which 404s on
+// the subpath — the landing page still renders because its CSS is inlined, so
+// the site looks fine and only the editor is silently broken. That is a
+// nasty failure to ship. './' makes Vite emit paths relative to each HTML
+// file, which is correct in both places.
+//
+// Internal links between pages are written relative by hand for the same
+// reason; Vite does not rewrite those. Canonical/OG URLs stay absolute on
+// purpose — they must point at the production domain wherever they are served.
+const base = process.env.VITE_BASE ?? './';
 
 export default defineConfig({
   base,

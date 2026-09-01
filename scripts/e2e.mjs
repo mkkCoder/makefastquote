@@ -168,10 +168,19 @@ await check('landing page renders and links to the editor', async () => {
     assert(await page.locator('h1').isVisible(), 'no visible h1');
     const title = await page.title();
     assert(/proposal/i.test(title), `title does not mention proposals: ${title}`);
+    // Relative, not absolute — the same build has to work at an apex domain
+    // and at a project subpath. See the base note in vite.config.ts.
     assert(
-      (await page.locator('a[href="/app/"]').count()) > 0,
-      'landing page has no link to the editor',
+      (await page.locator('a[href="./app/"]').count()) > 0,
+      'landing page has no relative link to the editor',
     );
+    assert(
+      (await page.locator('a[href^="/"]').count()) === 0,
+      'landing page has an absolute-rooted link, which breaks on a subpath',
+    );
+    // The hero must actually show a document, not an empty frame.
+    const heroDoc = await page.locator('.doc-frame svg').count();
+    assert(heroDoc === 1, `expected 1 hero document SVG, found ${heroDoc}`);
     // Structured data must be valid JSON or search engines silently drop it.
     const ld = await page.locator('script[type="application/ld+json"]').textContent();
     JSON.parse(ld);

@@ -52,7 +52,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 bg-panel/90 backdrop-blur border-b border-edge">
       <div className="max-w-[1600px] mx-auto px-4 h-14 flex items-center gap-3">
-        <a href="/" className="flex items-center gap-2 shrink-0" aria-label={`${SITE.name} home`}>
+        {/* Relative: the app lives at <base>/app/, so "../" is the landing
+            page whether the site is served from an apex domain or a subpath. */}
+        <a href="../" className="flex items-center gap-2 shrink-0" aria-label={`${SITE.name} home`}>
           <span
             aria-hidden
             className="w-7 h-7 rounded-lg bg-brand text-brand-ink grid place-items-center font-bold text-sm"

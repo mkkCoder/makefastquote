@@ -16,7 +16,8 @@
     "e2e": "node scripts/e2e.mjs",
     "shots": "node scripts/screenshots.mjs",
     "check:invisible": "node scripts/check-invisible.mjs",
-    "verify": "npm run check:invisible && npm run lint && npm run test && npm run build && npm run audit:contrast && npm run e2e"
+    "verify": "npm run check:invisible && npm run lint && npm run test && npm run build && npm run audit:contrast && npm run e2e",
+    "hero": "node scripts/make-hero.mjs"
   },
   "dependencies": {
     "jspdf": "^4.2.1",

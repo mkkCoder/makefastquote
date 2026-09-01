@@ -10,8 +10,8 @@
     />
     <link rel="canonical" href="https://makefastquote.com/" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#4338ca" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
 
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://makefastquote.com/" />
@@ -57,33 +57,33 @@
     <style>
       :root {
         color-scheme: light;
-        --ink: #16181d;
-        --muted: #4d525c;
-        --faint: #6b7280;
-        --surface: #f6f7f9;
+        --ink: #0f172a;
+        --muted: #334155;
+        --faint: #475569;
+        --surface: #f1f5f9;
         --panel: #ffffff;
-        --edge: #dfe3e8;
-        --edge-strong: #8c8f96;
-        --brand: #4338ca;
+        --edge: #e2e8f0;
+        --edge-strong: #64748b;
+        --brand: #4f46e5;
         --brand-ink: #ffffff;
-        --brand-soft: #eef0fe;
-        --glow: rgba(67, 56, 202, 0.1);
-        --shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 24px 60px rgb(15 23 42 / 0.16);
+        --brand-soft: #eef2ff;
+        --glow: rgba(79, 70, 229, 0.12);
+        --shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 24px 60px rgb(15 23 42 / 0.14);
       }
       @media (prefers-color-scheme: dark) {
         :root {
           color-scheme: dark;
-          --ink: #eceef2;
-          --muted: #b3b9c4;
-          --faint: #9aa1ad;
-          --surface: #0e1014;
-          --panel: #171a20;
-          --edge: #2b303a;
-          --edge-strong: #64666b;
+          --ink: #f8fafc;
+          --muted: #cbd5e1;
+          --faint: #94a3b8;
+          --surface: #0f172a;
+          --panel: #1e293b;
+          --edge: #334155;
+          --edge-strong: #94a3b8;
           --brand: #a5b4fc;
-          --brand-ink: #10121a;
-          --brand-soft: #232739;
-          --glow: rgba(99, 102, 241, 0.14);
+          --brand-ink: #0f172a;
+          --brand-soft: #312e81;
+          --glow: rgba(165, 180, 252, 0.16);
           --shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 30px 70px rgb(0 0 0 / 0.55);
         }
       }
@@ -465,6 +465,91 @@
         margin: 0 auto 1.75rem;
         max-width: 20ch;
       }
+      header.is-past-hero .scroll-cta {
+        display: inline-flex;
+      }
+      .scroll-cta {
+        display: none;
+        margin-left: 0.5rem;
+      }
+      .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1.25rem 0 0;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--muted);
+        background: var(--panel);
+        border: 1px solid var(--edge);
+        border-radius: 999px;
+        padding: 0.35rem 0.75rem;
+      }
+      .sandbox {
+        display: grid;
+        gap: 0.65rem;
+        grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+        margin: 0 0 1rem;
+      }
+      .sandbox label {
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.25rem;
+      }
+      .sandbox input {
+        width: 100%;
+        border: 1px solid var(--edge-strong);
+        border-radius: 0.5rem;
+        padding: 0.45rem 0.6rem;
+        font: inherit;
+        font-size: 0.875rem;
+        background: var(--panel);
+        color: var(--ink);
+      }
+      .seg {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0 0 1.25rem;
+      }
+      .seg button {
+        border: 1px solid var(--edge-strong);
+        background: var(--panel);
+        color: var(--ink);
+        border-radius: 999px;
+        padding: 0.4rem 0.9rem;
+        font: inherit;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .seg button[aria-current='true'],
+      .seg button[aria-pressed='true'] {
+        background: var(--brand);
+        color: var(--brand-ink);
+        border-color: var(--brand);
+      }
+      .template-frame {
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        background: #fff;
+        aspect-ratio: 210 / 196;
+      }
+      .template-frame svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
       footer {
         border-top: 1px solid var(--edge);
         padding: 2rem 0 3rem;
@@ -478,9 +563,8 @@
       <div class="wrap bar">
         <span class="mark" aria-hidden="true">Q</span>
         <span class="brand">makefastquote.com</span>
-        <a class="btn btn-primary btn-sm" href="./app/" style="margin-left: auto"
-          >Open the editor</a
-        >
+        <a class="btn btn-primary btn-sm" href="./app/" style="margin-left: auto">Open editor — Free</a>
+        <a class="btn btn-ghost btn-sm scroll-cta" href="./app/?upgrade=1">Unlock Pro</a>
       </div>
     </header>
 
@@ -497,18 +581,51 @@
               <a class="btn btn-primary" href="./app/">Make one now — free</a>
               <a class="btn btn-ghost" href="#pricing">What Pro adds</a>
             </div>
+            <div class="badges">
+              <span class="badge">Client-side only — nothing is uploaded</span>
+              <span class="badge">Instant export — real, selectable text</span>
+            </div>
             <p class="under-cta">Unlimited documents and real PDF export, free. Pro is $29 once.</p>
           </div>
 
           <div>
+            <form class="sandbox" onsubmit="return false">
+              <div>
+                <label for="sandbox-name">Your company</label>
+                <input id="sandbox-name" value="Studio Meridian" autocomplete="off" />
+              </div>
+              <div>
+                <label for="sandbox-item">Line item</label>
+                <input id="sandbox-item" value="Brand identity — logo, palette, type scale" autocomplete="off" />
+              </div>
+              <div>
+                <label for="sandbox-tax">Tax %</label>
+                <input id="sandbox-tax" value="0" inputmode="decimal" autocomplete="off" />
+              </div>
+            </form>
             <div class="doc-frame">
               <!--HERO_DOC_START-->
 <svg class="doc" role="img" aria-label="An example invoice produced by the tool" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297" font-family="Helvetica, Arial, 'Liberation Sans', sans-serif"><rect x="0" y="0" width="210" height="297" fill="#ffffff"></rect><rect x="0" y="0" width="210" height="6" fill="#4f46e5"></rect><text x="16" y="23" font-size="5.292" fill="#0f172a" text-anchor="start" font-weight="700" xml:space="preserve">Studio Meridian</text><text x="16" y="28" font-size="2.999" fill="#64748b" text-anchor="start" xml:space="preserve">hello@studiomeridian.com</text><text x="194" y="25" font-size="10.583" fill="#4f46e5" text-anchor="end" font-weight="700" letter-spacing="0.6" xml:space="preserve">INVOICE</text><text x="162" y="32" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Reference</text><text x="194" y="32" font-size="2.999" fill="#0f172a" text-anchor="end" xml:space="preserve">2026-014</text><text x="162" y="36.6" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Issued</text><text x="194" y="36.6" font-size="2.999" fill="#0f172a" text-anchor="end" xml:space="preserve">2026-09-01</text><text x="162" y="41.2" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Due</text><text x="194" y="41.2" font-size="2.999" fill="#0f172a" text-anchor="end" xml:space="preserve">2026-10-01</text><line x1="16" y1="51.8" x2="194" y2="51.8" stroke="#4f46e5" stroke-width="0.5"></line><text x="16" y="59.8" font-size="2.822" fill="#64748b" text-anchor="start" xml:space="preserve">Bill to</text><text x="16" y="64.8" font-size="3.881" fill="#0f172a" text-anchor="start" font-weight="700" xml:space="preserve">Northwind Coffee Co.</text><text x="16" y="69.8" font-size="2.999" fill="#64748b" text-anchor="start" xml:space="preserve">Dana Alvarez</text><text x="16" y="73.8" font-size="2.999" fill="#64748b" text-anchor="start" xml:space="preserve">dana@northwind.coffee</text><rect x="16" y="78.6" width="178" height="8" fill="#eef2ff"></rect><text x="18" y="83.8" font-size="2.822" fill="#64748b" text-anchor="start" font-weight="700" xml:space="preserve">Description</text><text x="124" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Qty</text><text x="156" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Unit</text><text x="174" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Tax</text><text x="194" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Amount</text><line x1="16" y1="86.8" x2="194" y2="86.8" stroke="#4f46e5" stroke-width="0.5"></line><text x="18" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="start" xml:space="preserve">Brand identity — logo, palette, type scale</text><text x="124" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">1</text><text x="156" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$2,400.00</text><text x="174" y="91.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">—</text><text x="194" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="end" font-weight="700" xml:space="preserve">$2,400.00</text><rect x="16" y="94.4" width="178" height="7" fill="#f8fafc"></rect><text x="18" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="start" xml:space="preserve">Packaging design (hours)</text><text x="124" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">14</text><text x="156" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$95.00</text><text x="174" y="98.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">—</text><text x="194" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="end" font-weight="700" xml:space="preserve">$1,330.00</text><text x="18" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="start" xml:space="preserve">Print-ready artwork</text><text x="124" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">1</text><text x="156" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$350.00</text><text x="174" y="105.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">—</text><text x="194" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="end" font-weight="700" xml:space="preserve">$350.00</text><line x1="116" y1="114.8" x2="194" y2="114.8" stroke="#4f46e5" stroke-width="0.5"></line><text x="154" y="120.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">Subtotal</text><text x="194" y="120.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$4,080.00</text><line x1="116" y1="123.3" x2="194" y2="123.3" stroke="#4f46e5" stroke-width="0.5"></line><text x="154" y="127.9" font-size="3.704" fill="#4f46e5" text-anchor="end" font-weight="700" xml:space="preserve">Total due</text><text x="194" y="127.9" font-size="4.233" fill="#4f46e5" text-anchor="end" font-weight="700" xml:space="preserve">$4,080.00</text><text x="16" y="140.9" font-size="2.822" fill="#64748b" text-anchor="start" xml:space="preserve">Payment terms</text><text x="16" y="145.9" font-size="2.999" fill="#0f172a" text-anchor="start" xml:space="preserve">Payment due within 30 days.</text><line x1="132" y1="163.9" x2="194" y2="163.9" stroke="#64748b" stroke-width="0.3"></line><text x="194" y="168.4" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Ana Reyes</text></svg>
 <!--HERO_DOC_END-->
             </div>
-            <p class="doc-caption">An actual export — not a mockup.</p>
+            <p class="doc-caption">Try it — this is the real layout engine, in the page.</p>
           </div>
         </div>
+      </section>
+
+      <section class="wrap" id="templates">
+        <p class="eyebrow">Templates</p>
+        <h2>Default, Minimal, or Studio Modern — with your logo where you want it.</h2>
+        <div class="seg">
+          <button type="button" data-template="standard">Default</button>
+          <button type="button" data-template="minimalist">Minimal</button>
+          <button type="button" data-template="modern" aria-current="true">Studio Modern</button>
+          <button type="button" id="toggle-logo" aria-pressed="true">Logo on</button>
+          <button type="button" data-align="left">Logo left</button>
+          <button type="button" data-align="center">Logo center</button>
+          <button type="button" data-align="right">Logo right</button>
+        </div>
+        <div class="template-frame" id="template-preview"></div>
       </section>
 
       <section class="wrap">
@@ -576,6 +693,7 @@
             <ul class="ticks">
               <li>Your logo on every document</li>
               <li>Three studio templates</li>
+              <li>Brand colour on the page</li>
               <li>No footer credit — the page is yours</li>
               <li>Everything in Free, forever</li>
             </ul>
@@ -603,8 +721,8 @@
         <details>
           <summary>What does Pro actually change?</summary>
           <p>
-            Your logo goes in the header, three more templates unlock, and the small footer credit
-            comes off. Everything else is in the free version and stays there.
+            Your logo, brand colour, three more templates, and the footer credit comes off.
+            Everything else is in the free version and stays there.
           </p>
         </details>
         <details>
@@ -631,5 +749,6 @@
         </p>
       </div>
     </footer>
+    <script type="module" src="/src/landing.ts"></script>
   </body>
 </html>

@@ -1,7 +1,26 @@
-import type { DocumentState, LineItem, Party, SignatureImage, Stroke } from '../types';
+import type {
+  DocumentState,
+  DocStatus,
+  LineItem,
+  LogoAlign,
+  Party,
+  SignatureImage,
+  Stroke,
+} from '../types';
 import { DOC_SCHEMA_VERSION, STORAGE_KEYS } from '../config';
+import { clampScale } from './logo';
+import { isHexColor } from './color';
+import { applyProfile, loadProfile } from './profile';
 
-const emptyParty = (): Party => ({ name: '', contact: '', email: '', phone: '', address: '' });
+const emptyParty = (): Party => ({
+  name: '',
+  contact: '',
+  email: '',
+  phone: '',
+  address: '',
+  taxId: '',
+  bank: '',
+});
 
 export const newItem = (): LineItem => ({
   id: crypto.randomUUID(),
@@ -20,24 +39,33 @@ const plusDays = (days: number): string => {
 };
 
 export function defaultDocument(): DocumentState {
-  return {
+  const fresh: DocumentState = {
     version: DOC_SCHEMA_VERSION,
+    id: crypto.randomUUID(),
     kind: 'proposal',
     template: 'standard',
     currency: 'USD',
     reference: `${new Date().getFullYear()}-001`,
     issueDate: today(),
     dueDate: plusDays(30),
+    status: 'draft',
     issuer: emptyParty(),
     client: emptyParty(),
     items: [newItem()],
     notes: '',
     discount: 0,
     logo: null,
+    logoScale: 1,
+    logoAlign: 'left',
+    logoAspect: null,
+    brandColor: null,
+    showCredit: false,
     signature: [],
     signatureImage: null,
     signatureName: '',
   };
+  const profile = loadProfile();
+  return profile ? applyProfile(fresh, profile) : fresh;
 }
 
 const num = (v: unknown, fallback = 0): number =>
@@ -52,6 +80,8 @@ function coerceParty(v: unknown): Party {
     email: str(o.email),
     phone: str(o.phone),
     address: str(o.address),
+    taxId: str(o.taxId),
+    bank: str(o.bank),
   };
 }
 
@@ -129,21 +159,40 @@ export function migrateDocument(raw: unknown): { doc: DocumentState; changed: bo
     : base.items;
 
   const logo = typeof o.logo === 'string' && o.logo.startsWith('data:image/') ? o.logo : null;
+  const align: LogoAlign =
+    o.logoAlign === 'center' || o.logoAlign === 'right' || o.logoAlign === 'left'
+      ? o.logoAlign
+      : 'left';
+  const status: DocStatus =
+    o.status === 'sent' || o.status === 'paid' || o.status === 'draft' ? o.status : 'draft';
+  const brandRaw = str(o.brandColor);
+  const brandColor = isHexColor(brandRaw) ? brandRaw : null;
+  const logoAspect =
+    typeof o.logoAspect === 'number' && Number.isFinite(o.logoAspect) && o.logoAspect > 0
+      ? o.logoAspect
+      : null;
 
   const doc: DocumentState = {
     version: DOC_SCHEMA_VERSION,
+    id: str(o.id) || crypto.randomUUID(),
     kind,
     template,
     currency: str(o.currency, 'USD'),
     reference: str(o.reference, base.reference),
     issueDate: str(o.issueDate, base.issueDate),
     dueDate: str(o.dueDate, base.dueDate),
+    status,
     issuer: coerceParty(o.issuer),
     client: coerceParty(o.client),
     items: items.length ? items : [newItem()],
     notes: str(o.notes),
     discount: Math.min(100, Math.max(0, num(o.discount))),
     logo,
+    logoScale: clampScale(num(o.logoScale, 1)),
+    logoAlign: align,
+    logoAspect,
+    brandColor,
+    showCredit: o.showCredit === true,
     signature: coerceStrokes(o.signature),
     signatureImage: coerceSignatureImage(o.signatureImage),
     signatureName: str(o.signatureName),

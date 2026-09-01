@@ -35,7 +35,7 @@ export function SidebarTop() {
               key={kind}
               type="button"
               onClick={() => setKind(kind)}
-              aria-current={doc.kind === kind}
+              aria-current={doc.kind === kind ? 'true' : undefined}
               data-testid={`kind-${kind}`}
               className={[
                 'btn justify-start flex-1 lg:flex-none',
@@ -77,7 +77,7 @@ export function SidebarRest() {
                 type="button"
                 onClick={() => setTemplate(id)}
                 data-testid={`template-${id}`}
-                aria-current={active}
+                aria-current={active ? 'true' : undefined}
                 className={[
                   'text-left px-3 py-2 rounded-lg border transition-colors',
                   active ? 'border-brand bg-brand-soft' : 'border-edge-strong hover:border-brand',

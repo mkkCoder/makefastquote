@@ -2,12 +2,18 @@ export type DocKind = 'proposal' | 'invoice';
 
 export type TemplateId = 'standard' | 'modern' | 'minimalist' | 'classic';
 
+export type DocStatus = 'draft' | 'sent' | 'paid';
+
+export type LogoAlign = 'left' | 'center' | 'right';
+
 export interface Party {
   name: string;
   contact: string;
   email: string;
   phone: string;
   address: string;
+  taxId: string;
+  bank: string;
 }
 
 export interface LineItem {
@@ -39,19 +45,31 @@ export interface SignatureImage {
 
 export interface DocumentState {
   version: number;
+  id: string;
   kind: DocKind;
   template: TemplateId;
   currency: string;
   reference: string;
   issueDate: string;
   dueDate: string;
+  status: DocStatus;
   issuer: Party;
   client: Party;
   items: LineItem[];
   notes: string;
   discount: number;
-  /** Data URL of an uploaded logo. Pro only — see lib/license.ts. */
+  /**
+   * Data URL of an uploaded logo. Free users can preview it; the PDF only
+   * includes it when `isPro` is true. See lib/license.ts.
+   */
   logo: string | null;
+  logoScale: number;
+  logoAlign: LogoAlign;
+  logoAspect: number | null;
+  /** Pro brand accent on the document. Preview-only for free users. */
+  brandColor: string | null;
+  /** When true, a Pro document still prints the free-tier credit line. */
+  showCredit: boolean;
   /** Drawn strokes. Ignored when `signatureImage` is set. */
   signature: Stroke[];
   /** An uploaded signature. Takes precedence over `signature` when present. */

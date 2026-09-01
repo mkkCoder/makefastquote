@@ -16,7 +16,7 @@ export function Preview() {
   const isPro = useApp((s) => s.isPro);
 
   const pages = useMemo(() => {
-    const { pages } = layoutDocument({ doc, isPro });
+    const { pages } = layoutDocument({ doc, isPro, preview: true });
     return pages.map(pageToSvg);
   }, [doc, isPro]);
 
@@ -32,9 +32,10 @@ export function Preview() {
           dangerouslySetInnerHTML={{ __html: svg }}
         />
       ))}
-      <p className="text-xs text-faint text-center">
+      <p className="text-xs text-muted text-center font-medium">
         {pages.length === 1 ? '1 page' : `${pages.length} pages`} · A4 · exports as real,
         searchable text
+        {!isPro && doc.logo ? ' · logo is a live preview' : ''}
       </p>
     </div>
   );

@@ -59,6 +59,26 @@ describe('migrateDocument', () => {
     expect(round.changed).toBe(false);
   });
 
+  it('migrates sender tax id, bank details and brand colour', () => {
+    const { doc } = migrateDocument({
+      issuer: { name: 'A', taxId: 'GB123', bank: 'IBAN 1' },
+      brandColor: '#2563eb',
+      logoAlign: 'center',
+      logoScale: 1.2,
+    });
+    expect(doc.issuer.taxId).toBe('GB123');
+    expect(doc.issuer.bank).toBe('IBAN 1');
+    expect(doc.brandColor).toBe('#2563eb');
+    expect(doc.logoAlign).toBe('center');
+    expect(doc.logoScale).toBe(1.2);
+    expect(doc.status).toBe('draft');
+    expect(doc.id).toBeTruthy();
+  });
+
+  it('drops a brand colour that is not a hex value', () => {
+    expect(migrateDocument({ brandColor: 'red' }).doc.brandColor).toBeNull();
+  });
+
   it('rejects an unknown template rather than rendering nothing', () => {
     expect(migrateDocument({ template: 'neon' }).doc.template).toBe('standard');
   });

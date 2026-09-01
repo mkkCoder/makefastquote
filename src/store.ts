@@ -4,6 +4,7 @@ import type {
   DocumentState,
   LicenseState,
   LineItem,
+  LogoAlign,
   Party,
   SignatureImage,
   Stroke,
@@ -12,6 +13,9 @@ import type {
 import { defaultDocument, loadDocument, newItem, saveDocument, clearDocument } from './lib/persist';
 import { emptyLicense, loadLicense, saveLicense, clearLicense } from './lib/license';
 import { TEMPLATES } from './pdf/templates';
+import { loadArchive, upsertArchive, removeArchive, type ArchiveEntry } from './lib/archive';
+import { loadProfile, saveProfile, profileFromDoc } from './lib/profile';
+import { clampScale } from './lib/logo';
 
 interface AppState {
   doc: DocumentState;
@@ -20,18 +24,26 @@ interface AppState {
   /** Non-null when the upgrade modal is open; the string is what prompted it. */
   upgradeReason: string | null;
   saveNotice: string | null;
+  workspaceTab: 'form' | 'preview';
+  historyOpen: boolean;
+  archive: ArchiveEntry[];
+  lastItemId: string | null;
+  profileSavedAt: number | null;
 
   setKind: (kind: DocKind) => void;
   setTemplate: (id: TemplateId) => void;
   patchDoc: (patch: Partial<DocumentState>) => void;
   patchParty: (which: 'issuer' | 'client', patch: Partial<Party>) => void;
   addItem: () => void;
+  duplicateItem: (id: string) => void;
   updateItem: (id: string, patch: Partial<LineItem>) => void;
   removeItem: (id: string) => void;
   moveItem: (id: string, delta: number) => void;
   setSignature: (strokes: Stroke[]) => void;
   setSignatureImage: (image: SignatureImage | null) => void;
-  setLogo: (dataUrl: string | null) => void;
+  setLogo: (logo: string | null, aspect?: number | null) => void;
+  setLogoScale: (scale: number) => void;
+  setLogoAlign: (align: LogoAlign) => void;
 
   openUpgrade: (reason: string) => void;
   closeUpgrade: () => void;
@@ -40,6 +52,11 @@ interface AppState {
 
   saveDraft: () => void;
   resetDoc: () => void;
+  rememberProfile: () => void;
+  setWorkspaceTab: (tab: 'form' | 'preview') => void;
+  setHistoryOpen: (open: boolean) => void;
+  loadFromArchive: (id: string) => void;
+  deleteFromArchive: (id: string) => void;
   clearNotice: () => void;
 }
 
@@ -69,11 +86,14 @@ export const useApp = create<AppState>((set, get) => {
     isPro: license.valid,
     upgradeReason: null,
     saveNotice: null,
+    workspaceTab: 'form',
+    historyOpen: false,
+    archive: loadArchive(),
+    lastItemId: null,
+    profileSavedAt: loadProfile() ? 1 : null,
 
     setKind: (kind) => {
       const next = { ...get().doc, kind };
-      // Proposals and invoices use different default reference prefixes; only
-      // rewrite one the user has not touched.
       set({ doc: next });
       scheduleSave(next);
     },
@@ -103,9 +123,23 @@ export const useApp = create<AppState>((set, get) => {
     },
 
     addItem: () => {
+      const item = newItem();
       const cur = get().doc;
-      const next = { ...cur, items: [...cur.items, newItem()] };
-      set({ doc: next });
+      const next = { ...cur, items: [...cur.items, item] };
+      set({ doc: next, lastItemId: item.id });
+      scheduleSave(next);
+    },
+
+    duplicateItem: (id) => {
+      const cur = get().doc;
+      const i = cur.items.findIndex((it) => it.id === id);
+      if (i < 0) return;
+      const src = cur.items[i];
+      if (!src) return;
+      const copy = { ...src, id: crypto.randomUUID() };
+      const items = [...cur.items.slice(0, i + 1), copy, ...cur.items.slice(i + 1)];
+      const next = { ...cur, items };
+      set({ doc: next, lastItemId: copy.id });
       scheduleSave(next);
     },
 
@@ -144,30 +178,32 @@ export const useApp = create<AppState>((set, get) => {
     },
 
     setSignature: (signature) => {
-      // Drawing clears an uploaded signature: the document has one signature
-      // line, and keeping both would silently discard whichever the layout
-      // happens not to prefer.
       const next = { ...get().doc, signature, signatureImage: null };
       set({ doc: next });
       scheduleSave(next);
     },
 
     setSignatureImage: (signatureImage) => {
-      // ...and the reverse. Uploading replaces whatever was drawn.
       const next = { ...get().doc, signatureImage, signature: [] };
       set({ doc: next });
-      // Written immediately: this follows an explicit file pick, and a base64
-      // PNG is the one payload where losing the debounce window would cost the
-      // user a re-upload rather than a keystroke.
       flushSave(next);
     },
 
-    setLogo: (logo) => {
-      if (logo && !get().isPro) {
-        set({ upgradeReason: 'your own logo' });
-        return;
-      }
-      const next = { ...get().doc, logo };
+    setLogo: (logo, aspect = null) => {
+      // Free users may preview a logo; the PDF gate lives in layout.ts.
+      const next = { ...get().doc, logo, logoAspect: logo ? (aspect ?? get().doc.logoAspect) : null };
+      set({ doc: next });
+      flushSave(next);
+    },
+
+    setLogoScale: (scale) => {
+      const next = { ...get().doc, logoScale: clampScale(scale) };
+      set({ doc: next });
+      scheduleSave(next);
+    },
+
+    setLogoAlign: (logoAlign) => {
+      const next = { ...get().doc, logoAlign };
       set({ doc: next });
       scheduleSave(next);
     },
@@ -178,28 +214,22 @@ export const useApp = create<AppState>((set, get) => {
     setLicense: (license) => {
       saveLicense(license);
       set({ license, isPro: license.valid });
-      // A template chosen before upgrading stays chosen; nothing to migrate.
     },
 
     deactivate: () => {
       clearLicense();
       const cur = get().doc;
       const tpl = TEMPLATES[cur.template];
-      // Drop back to a template they are entitled to, so the preview never
-      // shows a document they cannot export.
       const next = tpl.pro ? { ...cur, template: 'standard' as TemplateId } : cur;
       set({ license: emptyLicense(), isPro: false, doc: next });
-      // Written immediately rather than through the debounce. Autosave is
-      // debounced because typing fires it on every keystroke; a one-off click
-      // that changes entitlement has no such problem, and leaving a 400 ms
-      // window where storage still says "Pro, Modern template" is the kind of
-      // gap that shows up as a confusing state after a crash or a fast close.
       flushSave(next);
     },
 
     saveDraft: () => {
-      flushSave(get().doc);
-      set({ saveNotice: 'Draft saved in this browser.' });
+      const cur = get().doc;
+      flushSave(cur);
+      const archive = upsertArchive(cur);
+      set({ archive, saveNotice: 'Draft saved in this browser.' });
       setTimeout(() => {
         if (get().saveNotice) set({ saveNotice: null });
       }, 2600);
@@ -213,6 +243,31 @@ export const useApp = create<AppState>((set, get) => {
       setTimeout(() => {
         if (get().saveNotice) set({ saveNotice: null });
       }, 2600);
+    },
+
+    rememberProfile: () => {
+      saveProfile(profileFromDoc(get().doc));
+      set({ profileSavedAt: Date.now(), saveNotice: 'Business profile saved on this device.' });
+      setTimeout(() => {
+        if (get().saveNotice) set({ saveNotice: null });
+      }, 2600);
+    },
+
+    setWorkspaceTab: (workspaceTab) => set({ workspaceTab }),
+    setHistoryOpen: (historyOpen) => set({ historyOpen }),
+
+    loadFromArchive: (id) => {
+      const entry = get().archive.find((e) => e.id === id);
+      if (!entry) return;
+      flushSave(get().doc);
+      upsertArchive(get().doc);
+      const next = entry.doc;
+      set({ doc: next, historyOpen: false, archive: loadArchive() });
+      flushSave(next);
+    },
+
+    deleteFromArchive: (id) => {
+      set({ archive: removeArchive(id) });
     },
 
     clearNotice: () => set({ saveNotice: null }),

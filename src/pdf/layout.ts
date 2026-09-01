@@ -1,8 +1,10 @@
 import type { DocumentState, Stroke } from '../types';
 import { computeTotals, formatMoney } from '../lib/money';
-import { TEMPLATES } from './templates';
+import { TEMPLATES, type Template } from './templates';
 import { measureText, wrapText, truncateToWidth, fitFontSize, type FontWeight } from './text';
 import { SITE } from '../config';
+import { clampScale } from '../lib/logo';
+import { isHexColor, mixHex } from '../lib/color';
 
 /**
  * THE SINGLE SOURCE OF LAYOUT TRUTH.
@@ -66,8 +68,26 @@ export interface LayoutResult {
 
 export interface LayoutInput {
   doc: DocumentState;
-  /** Drives the credit line and the logo. See the note on the gate below. */
+  /** Drives the credit line and paid branding in the exported file. */
   isPro: boolean;
+  /**
+   * The on-screen canvas may preview a logo and brand colour for free users.
+   * The PDF path never sets this, so the file stays gated. See the note on
+   * the gate at the bottom of this file.
+   */
+  preview?: boolean;
+}
+
+function resolveTemplate(doc: DocumentState, branded: boolean): Template {
+  const tpl = { ...TEMPLATES[doc.template] };
+  if (!branded || !isHexColor(doc.brandColor)) return tpl;
+  const accent = doc.brandColor;
+  return {
+    ...tpl,
+    accent,
+    bandFill: tpl.bandHeight > 0 ? accent : tpl.bandFill,
+    headFill: tpl.headFill ? mixHex(accent, '#ffffff', 0.88) : tpl.headFill,
+  };
 }
 
 const COLUMNS = {
@@ -88,8 +108,10 @@ function strokeToPage(
   return stroke.map(([nx, ny]) => [box.x + nx * box.w, box.y + ny * box.h] as const);
 }
 
-export function layoutDocument({ doc, isPro }: LayoutInput): LayoutResult {
-  const tpl = TEMPLATES[doc.template];
+export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): LayoutResult {
+  const branded = isPro || preview;
+  const tpl = resolveTemplate(doc, branded);
+  const showLogo = Boolean(doc.logo) && branded;
   const pages: LaidOutPage[] = [];
   let ops: Op[] = [];
   // Annotated: MARGIN is `as const`, so an inferred `y` would be the literal
@@ -151,10 +173,24 @@ export function layoutDocument({ doc, isPro }: LayoutInput): LayoutResult {
   const identityTop = y;
   let identityBottom: number;
 
-  if (isPro && doc.logo) {
-    const logoH = 16;
-    ops.push({ t: 'image', x: MARGIN.left, y, w: 40, h: logoH, src: doc.logo });
-    identityBottom = y + logoH + 4;
+  if (showLogo && doc.logo) {
+    const aspect =
+      Number.isFinite(doc.logoAspect) && doc.logoAspect && doc.logoAspect > 0 ? doc.logoAspect : 2.5;
+    const scale = clampScale(doc.logoScale);
+    const maxH = 16 * scale;
+    const maxW = 52 * scale;
+    let h = maxH;
+    let w = h * aspect;
+    if (w > maxW) {
+      w = maxW;
+      h = w / aspect;
+    }
+    const colW = CONTENT_W * 0.5;
+    let x = MARGIN.left;
+    if (doc.logoAlign === 'center') x = MARGIN.left + Math.max(0, (colW - w) / 2);
+    if (doc.logoAlign === 'right') x = MARGIN.left + Math.max(0, colW - w);
+    ops.push({ t: 'image', x, y, w, h, src: doc.logo });
+    identityBottom = y + h + 4;
   } else {
     const name = doc.issuer.name || 'Your business';
     // Fit, do not guess: a long business name must not run into the title.
@@ -164,10 +200,12 @@ export function layoutDocument({ doc, isPro }: LayoutInput): LayoutResult {
   }
 
   const issuerLines = [
-    isPro && doc.logo ? doc.issuer.name : '',
+    showLogo ? doc.issuer.name : '',
     doc.issuer.contact,
     doc.issuer.email,
     doc.issuer.phone,
+    doc.issuer.taxId ? `Tax ID ${doc.issuer.taxId}` : '',
+    doc.issuer.bank,
     ...(doc.issuer.address ? doc.issuer.address.split(/\r?\n/) : []),
   ].filter(Boolean);
 
@@ -260,18 +298,18 @@ export function layoutDocument({ doc, isPro }: LayoutInput): LayoutResult {
     }
     text('Description', COLUMNS.desc.x + (tpl.headFill ? 2 : 0), y, 8, {
       weight: 'bold',
-      color: tpl.muted,
+      color: tpl.ink,
     });
-    text('Qty', rightEdge(COLUMNS.qty), y, 8, { weight: 'bold', color: tpl.muted, align: 'right' });
+    text('Qty', rightEdge(COLUMNS.qty), y, 8, { weight: 'bold', color: tpl.ink, align: 'right' });
     text('Unit', rightEdge(COLUMNS.price), y, 8, {
       weight: 'bold',
-      color: tpl.muted,
+      color: tpl.ink,
       align: 'right',
     });
-    text('Tax', rightEdge(COLUMNS.tax), y, 8, { weight: 'bold', color: tpl.muted, align: 'right' });
+    text('Tax', rightEdge(COLUMNS.tax), y, 8, { weight: 'bold', color: tpl.ink, align: 'right' });
     text('Amount', rightEdge(COLUMNS.total), y, 8, {
       weight: 'bold',
-      color: tpl.muted,
+      color: tpl.ink,
       align: 'right',
     });
     y += 3;
@@ -490,7 +528,7 @@ export function layoutDocument({ doc, isPro }: LayoutInput): LayoutResult {
         align: 'right',
       });
     }
-    if (!isPro) {
+    if (!isPro || doc.showCredit) {
       const credit = `Made with ${SITE.domain}`;
       // Fit the credit line rather than trusting a hardcoded size: the domain
       // is a variable, and the day it gets longer this would silently overrun.

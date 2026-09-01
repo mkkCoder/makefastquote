@@ -3,7 +3,7 @@ import { useApp } from '../store';
 import { SITE, STORAGE_KEYS } from '../config';
 import { buildPdf, suggestedFilename } from '../pdf/render';
 import { downloadBlob, toCsv, toJson } from '../lib/exportData';
-import { IconDownload, IconMoon, IconSave, IconSun, IconTable } from './Icons';
+import { IconDownload, IconHistory, IconMoon, IconSave, IconSun, IconTable } from './Icons';
 
 type Theme = 'light' | 'dark';
 
@@ -22,6 +22,8 @@ export function Header() {
   const isPro = useApp((s) => s.isPro);
   const saveDraft = useApp((s) => s.saveDraft);
   const saveNotice = useApp((s) => s.saveNotice);
+  const openUpgrade = useApp((s) => s.openUpgrade);
+  const setHistoryOpen = useApp((s) => s.setHistoryOpen);
 
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const [exporting, setExporting] = useState(false);
@@ -37,6 +39,10 @@ export function Header() {
   }, [theme]);
 
   const downloadPdf = async () => {
+    if (!isPro && (doc.logo || doc.brandColor)) {
+      openUpgrade('logo-export');
+      return;
+    }
     setExporting(true);
     try {
       const blob = await buildPdf({ doc, isPro });
@@ -64,8 +70,8 @@ export function Header() {
           <span className="font-bold text-sm hidden sm:block">{SITE.domain}</span>
         </a>
 
-        {saveNotice && (
-          <span className="text-xs text-muted hidden md:block" role="status">
+          {saveNotice && (
+          <span className="text-xs font-semibold text-accent hidden md:block" role="status">
             {saveNotice}
           </span>
         )}
@@ -79,6 +85,17 @@ export function Header() {
           >
             <IconSave className="w-3.5 h-3.5" />
             Save draft
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-ghost px-2"
+            onClick={() => setHistoryOpen(true)}
+            data-testid="history-open"
+            aria-label="Document history"
+          >
+            <IconHistory className="w-4 h-4" />
+            <span className="hidden md:inline">History</span>
           </button>
 
           <div className="relative">

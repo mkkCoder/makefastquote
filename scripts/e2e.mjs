@@ -329,7 +329,7 @@ await check('an old save file loads through migration and is repaired on disk', 
         { what: 'the migrated document to be written back' },
       );
 
-      assert(stored.version === 1, `version not stamped: ${stored.version}`);
+      assert(stored.version === 2, `version not stamped: ${stored.version}`);
       assert(typeof stored.items[0].id === 'string', 'legacy row did not get an id');
       assert(stored.items[0].description === 'Legacy row', 'legacy content lost in migration');
       assert(stored.logo === null, 'a non-image logo URL survived migration');
@@ -556,11 +556,27 @@ await check('a Pro template opens the upgrade modal instead of applying', async 
   assertNoConsoleErrors(errors);
 });
 
-await check('the logo button opens the upgrade modal for a free user', async () => {
+await check('a free user can preview a logo; download asks to unlock Pro', async () => {
   const errors = await withPage(async (page) => {
     await page.goto(`${origin}/app/`, { waitUntil: 'load' });
-    await page.locator('[data-testid="logo-button"]').click();
+    await page.locator('[data-testid="logo-file"]').setInputFiles({
+      name: 'logo.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from(BLANK_PNG_BASE64, 'base64'),
+    });
+    await waitFor(
+      async () => {
+        const s = await page.locator('[data-testid="preview-page-1"] svg').innerHTML();
+        return s.includes('<image') ? s : null;
+      },
+      { what: 'the logo to appear in the preview' },
+    );
+    await page.locator('[data-testid="download-pdf"]').click();
     await page.locator('[role="dialog"]').waitFor({ state: 'visible' });
+    assert(
+      (await page.getByText(/Unlock your custom logo/i).count()) > 0,
+      'unlock copy missing from the logo-export modal',
+    );
   });
   assertNoConsoleErrors(errors);
 });
@@ -728,6 +744,13 @@ for (const [label, viewport] of [
       async (page) => {
         await page.goto(`${origin}/app/`, { waitUntil: 'load' });
         await page.locator('#f-business-or-your-name').fill('Jane Doe Design');
+
+        // Below the lg breakpoint the workspace is tabbed; switch to the
+        // preview so we are asserting against the sheet, not an empty pane.
+        const previewTab = page.locator('[data-testid="tab-preview"]');
+        if (await previewTab.isVisible()) {
+          await previewTab.click();
+        }
 
         const overflow = await page.evaluate(
           () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

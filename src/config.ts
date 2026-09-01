@@ -76,7 +76,9 @@ export const STORAGE_KEYS = {
   doc: 'mfq.document.v1',
   license: 'mfq.license.v1',
   theme: 'mfq.theme.v1',
+  profile: 'mfq.profile.v1',
+  archive: 'mfq.archive.v1',
 } as const;
 
 /** Bumped whenever the persisted document shape changes. See lib/persist.ts. */
-export const DOC_SCHEMA_VERSION = 1;
+export const DOC_SCHEMA_VERSION = 2;

@@ -4,18 +4,22 @@ import { PRICE, SITE } from '../config';
 import { isCheckoutConfigured, openCheckout } from '../lib/checkout';
 import { validateKey } from '../lib/license';
 import { cleanPastedKey } from '../pdf/text';
+import { buildPdf, suggestedFilename } from '../pdf/render';
+import { downloadBlob } from '../lib/exportData';
 import { IconCheck, IconSparkle, IconX } from './Icons';
 
 const BENEFITS = [
   ['Your logo on every document', 'Upload once. It sits in the header of every proposal and invoice you send.'],
   ['Three studio templates', 'Modern, Minimalist and Classic — different enough that clients notice.'],
-  ['Nothing but your brand', 'No footer credit. The document is yours end to end.'],
+  ['Your colour, no footer credit', 'Brand the table and totals. The document is yours end to end.'],
 ] as const;
 
 export function UpgradeModal() {
   const reason = useApp((s) => s.upgradeReason);
   const close = useApp((s) => s.closeUpgrade);
   const setLicense = useApp((s) => s.setLicense);
+  const doc = useApp((s) => s.doc);
+  const isLogoExport = reason === 'logo-export';
 
   const [key, setKey] = useState('');
   const [status, setStatus] = useState<'idle' | 'checking' | 'error' | 'done'>('idle');
@@ -117,10 +121,14 @@ export function UpgradeModal() {
               {SITE.name} Pro
             </div>
             <h2 id="upgrade-title" className="text-xl font-bold leading-tight">
-              Put your brand on it
+              {isLogoExport
+                ? `Unlock your custom logo and remove all watermarks with Pro (${PRICE.display} one-time).`
+                : 'Put your brand on it'}
             </h2>
             <p className="text-sm text-muted mt-1">
-              Unlocks {reason} — and everything else below, once, forever.
+              {isLogoExport
+                ? 'The canvas already shows your logo. Pro puts it on the PDF — and takes the credit line off.'
+                : `Unlocks ${reason} — and everything else below, once, forever.`}
             </p>
           </div>
           <button
@@ -171,6 +179,21 @@ export function UpgradeModal() {
                   Checkout is not connected yet. Set <code>CHECKOUT_URL</code> in{' '}
                   <code>src/config.ts</code> to your Lemon Squeezy product URL.
                 </p>
+              )}
+
+              {isLogoExport && (
+                <button
+                  type="button"
+                  className="btn btn-ghost w-full mt-2 text-sm"
+                  data-testid="download-plain"
+                  onClick={async () => {
+                    const blob = await buildPdf({ doc, isPro: false });
+                    downloadBlob(blob, suggestedFilename(doc));
+                    close();
+                  }}
+                >
+                  Download without logo or brand colour
+                </button>
               )}
 
               <p className="text-[11px] text-faint text-center mt-2">

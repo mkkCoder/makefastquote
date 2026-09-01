@@ -42,48 +42,48 @@
 
 :root {
   color-scheme: light;
-  --ink: #16181d;
-  --muted: #4d525c;
-  --faint: #6b7280;
-  --surface: #f6f7f9;
+  --ink: #0f172a;
+  --muted: #334155;
+  --faint: #475569;
+  --surface: #f1f5f9;
   --panel: #ffffff;
-  --edge: #dfe3e8;
-  --edge-strong: #8c8f96;
-  --brand: #4338ca;
+  --edge: #e2e8f0;
+  --edge-strong: #64748b;
+  --brand: #4f46e5;
   --brand-ink: #ffffff;
-  --brand-soft: #eef0fe;
-  --accent: #0f766e;
+  --brand-soft: #eef2ff;
+  --accent: #059669;
 }
 
 html[data-theme='dark'] {
   color-scheme: dark;
-  --ink: #eceef2;
-  --muted: #b3b9c4;
-  --faint: #9aa1ad;
-  --surface: #0e1014;
-  --panel: #171a20;
-  --edge: #2b303a;
-  --edge-strong: #64666b;
+  --ink: #f8fafc;
+  --muted: #cbd5e1;
+  --faint: #94a3b8;
+  --surface: #0f172a;
+  --panel: #1e293b;
+  --edge: #334155;
+  --edge-strong: #94a3b8;
   --brand: #a5b4fc;
-  --brand-ink: #10121a;
-  --brand-soft: #232739;
-  --accent: #5eead4;
+  --brand-ink: #0f172a;
+  --brand-soft: #312e81;
+  --accent: #34d399;
 }
 
 @media (prefers-color-scheme: dark) {
   html:not([data-theme='light']) {
     color-scheme: dark;
-    --ink: #eceef2;
-    --muted: #b3b9c4;
-    --faint: #9aa1ad;
-    --surface: #0e1014;
-    --panel: #171a20;
-    --edge: #2b303a;
-    --edge-strong: #64666b;
+    --ink: #f8fafc;
+    --muted: #cbd5e1;
+    --faint: #94a3b8;
+    --surface: #0f172a;
+    --panel: #1e293b;
+    --edge: #334155;
+    --edge-strong: #94a3b8;
     --brand: #a5b4fc;
-    --brand-ink: #10121a;
-    --brand-soft: #232739;
-    --accent: #5eead4;
+    --brand-ink: #0f172a;
+    --brand-soft: #312e81;
+    --accent: #34d399;
   }
 }
 
@@ -141,10 +141,10 @@ body {
   .label {
     display: block;
     font-size: 0.6875rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--faint);
+    color: var(--muted);
     margin-bottom: 0.3rem;
   }
 
@@ -171,6 +171,7 @@ body {
   .btn-primary {
     background: var(--brand);
     color: var(--brand-ink);
+    box-shadow: 0 1px 2px rgb(79 70 229 / 0.35);
   }
   .btn-primary:hover {
     background: color-mix(in srgb, var(--brand) 88%, black);
@@ -190,8 +191,27 @@ body {
     aspect-ratio: 210 / 297;
     background: #fff;
     border-radius: 2px;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.08), 0 12px 28px rgb(0 0 0 / 0.12);
+    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.08);
     overflow: hidden;
+  }
+
+  .fab {
+    position: fixed;
+    right: 1rem;
+    bottom: 5.25rem;
+    z-index: 25;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--brand);
+    color: var(--brand-ink);
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 0.85rem 1.1rem;
+    border-radius: 999px;
+    border: 0;
+    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.25);
+    cursor: pointer;
   }
 }
 

@@ -8,8 +8,8 @@ import type { DocumentState } from '../types';
 
 const doc = (over: Partial<DocumentState> = {}): DocumentState => ({
   ...defaultDocument(),
-  issuer: { name: 'Jane Doe Design', contact: '', email: 'j@d.com', phone: '', address: '' },
-  client: { name: 'Acme Ltd', contact: 'Sam', email: 's@a.com', phone: '', address: '' },
+  issuer: { name: 'Jane Doe Design', contact: '', email: 'j@d.com', phone: '', address: '', taxId: '', bank: '' },
+  client: { name: 'Acme Ltd', contact: 'Sam', email: 's@a.com', phone: '', address: '', taxId: '', bank: '' },
   items: [{ ...newItem(), qty: 2, description: 'Design work', unitPrice: 500, taxRate: 20 }],
   ...over,
 });
@@ -44,8 +44,8 @@ describe('layoutDocument', () => {
     const long = 'Wolfeschlegelsteinhausenbergerdorff Consulting International Limited';
     const { pages } = layoutDocument({
       doc: doc({
-        issuer: { name: long, contact: '', email: `${long}@example.com`, phone: '', address: '' },
-        client: { name: long, contact: long, email: '', phone: '', address: long },
+        issuer: { name: long, contact: '', email: `${long}@example.com`, phone: '', address: '', taxId: '', bank: '' },
+        client: { name: long, contact: long, email: '', phone: '', address: long, taxId: '', bank: '' },
         items: [{ ...newItem(), qty: 1, description: long.repeat(3), unitPrice: 1234567.89 }],
       }),
       isPro: false,
@@ -124,12 +124,34 @@ describe('the free-tier gate is inside the generating code', () => {
   });
 
   it('draws a logo for a Pro user and never for a free one', () => {
-    const withLogo = doc({ logo: 'data:image/png;base64,AAAA' });
+    const withLogo = doc({ logo: 'data:image/png;base64,AAAA', logoAspect: 2 });
     const pro = allOps(layoutDocument({ doc: withLogo, isPro: true }).pages);
     const free = allOps(layoutDocument({ doc: withLogo, isPro: false }).pages);
     expect(pro.some((o) => o.t === 'image')).toBe(true);
     // Even with a logo present in state, the free document does not draw it.
     expect(free.some((o) => o.t === 'image')).toBe(false);
+  });
+
+  it('lets a free user preview a logo without putting it in the export layout', () => {
+    const withLogo = doc({ logo: 'data:image/png;base64,AAAA', logoAspect: 2 });
+    const preview = allOps(layoutDocument({ doc: withLogo, isPro: false, preview: true }).pages);
+    expect(preview.some((o) => o.t === 'image')).toBe(true);
+  });
+
+  it('applies a Pro brand colour to rules and totals', () => {
+    const { pages } = layoutDocument({
+      doc: doc({ brandColor: '#2563eb' }),
+      isPro: true,
+    });
+    const lines = allOps(pages).filter((o): o is Extract<Op, { t: 'line' }> => o.t === 'line');
+    expect(lines.some((l) => l.color === '#2563eb')).toBe(true);
+  });
+
+  it('prints the credit line on a Pro document only when showCredit is on', () => {
+    const on = layoutDocument({ doc: doc({ showCredit: true }), isPro: true });
+    const off = layoutDocument({ doc: doc({ showCredit: false }), isPro: true });
+    expect(texts(allOps(on.pages))).toContain(credit);
+    expect(texts(allOps(off.pages))).not.toContain(credit);
   });
 });
 

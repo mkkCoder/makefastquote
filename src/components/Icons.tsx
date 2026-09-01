@@ -132,6 +132,14 @@ export const IconChevronDown = ({ className, strokeWidth }: Props) => (
   </svg>
 );
 
+export const IconHistory = ({ className, strokeWidth }: Props) => (
+  <svg {...base(className, strokeWidth)}>
+    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+    <path d="M3 3v5h5" />
+    <path d="M12 7v5l4 2" />
+  </svg>
+);
+
 export const IconEraser = ({ className, strokeWidth }: Props) => (
   <svg {...base(className, strokeWidth)}>
     <path d="M20 20H8.5L3 14.5a2 2 0 0 1 0-2.8l8-8a2 2 0 0 1 2.8 0l6.5 6.5a2 2 0 0 1 0 2.8L14 20" />

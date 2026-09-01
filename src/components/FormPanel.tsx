@@ -1,27 +1,41 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 import { useApp } from '../store';
 import { CURRENCIES } from '../lib/money';
+import { PRICE } from '../config';
 import { LineItems } from './LineItems';
 import { SignaturePad } from './SignaturePad';
-import { IconLock, IconUpload, IconX } from './Icons';
+import { LogoUploader } from './LogoUploader';
+import { isHexColor } from '../lib/color';
 
 function Section({
   title,
   hint,
   children,
+  defaultOpen = true,
 }: {
   title: string;
   hint?: string;
   children: React.ReactNode;
+  defaultOpen?: boolean;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
-    <section className="bg-panel border border-edge rounded-xl p-4">
-      <div className="mb-3">
-        <h3 className="text-sm font-bold">{title}</h3>
-        {hint && <p className="text-xs text-faint mt-0.5">{hint}</p>}
-      </div>
-      {children}
-    </section>
+    <details
+      className="bg-panel border border-edge rounded-xl group"
+      open={open}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
+    >
+      <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+        <span>
+          <h3 className="text-sm font-bold tracking-tight">{title}</h3>
+          {hint && <p className="text-xs text-muted mt-0.5">{hint}</p>}
+        </span>
+        <span className="text-brand text-lg leading-none group-open:rotate-45 transition-transform" aria-hidden>
+          +
+        </span>
+      </summary>
+      <div className="px-4 pb-4">{children}</div>
+    </details>
   );
 }
 
@@ -75,28 +89,12 @@ export function FormPanel() {
   const patchParty = useApp((s) => s.patchParty);
   const setSignature = useApp((s) => s.setSignature);
   const setSignatureImage = useApp((s) => s.setSignatureImage);
-  const setLogo = useApp((s) => s.setLogo);
+  const rememberProfile = useApp((s) => s.rememberProfile);
   const openUpgrade = useApp((s) => s.openUpgrade);
-  const fileRef = useRef<HTMLInputElement | null>(null);
-
-  const onLogoPicked = (file: File | undefined) => {
-    if (!file) return;
-    if (file.size > 1_500_000) {
-      // A 5 MB logo blows the localStorage quota and takes the autosave with
-      // it, so refuse early with a reason rather than failing silently later.
-      alert('That image is over 1.5 MB. Please use a smaller logo.');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') setLogo(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
 
   return (
-    <div className="flex flex-col gap-4">
-      <Section title="Your details" hint="Appears at the top of the document.">
+    <div className="flex flex-col gap-3">
+      <Section title="Sender profile" hint="Your business. Saved as a preset if you want.">
         <div className="grid sm:grid-cols-2 gap-3">
           <Field
             label="Business or your name"
@@ -123,6 +121,12 @@ export function FormPanel() {
             onChange={(v) => patchParty('issuer', { contact: v })}
             placeholder="Optional"
           />
+          <Field
+            label="VAT or tax ID"
+            value={doc.issuer.taxId}
+            onChange={(v) => patchParty('issuer', { taxId: v })}
+            placeholder="Optional"
+          />
           <div className="sm:col-span-2">
             <Field
               label="Address"
@@ -134,53 +138,56 @@ export function FormPanel() {
           </div>
         </div>
 
-        <div className="mt-3 pt-3 border-t border-edge">
-          <span className="label">Logo</span>
-          {isPro && doc.logo ? (
-            <div className="flex items-center gap-3">
-              <img
-                src={doc.logo}
-                alt="Your logo"
-                className="h-10 max-w-32 object-contain bg-white rounded border border-edge p-1"
-              />
-              <button
-                type="button"
-                className="btn btn-ghost text-xs"
-                onClick={() => setLogo(null)}
-              >
-                <IconX className="w-3 h-3" />
-                Remove
-              </button>
-            </div>
-          ) : (
+        <div className="mt-4 pt-3 border-t border-edge">
+          <LogoUploader />
+        </div>
+
+        <div className="mt-4 pt-3 border-t border-edge">
+          <span className="label">Brand colour on the document</span>
+          <p className="text-xs text-muted mb-2">
+            Table headers, rules and the total. {isPro ? 'Included in the PDF.' : `Preview now; PDF export is Pro (${PRICE.display}).`}
+          </p>
+          <div className="flex items-center gap-3">
+            <input
+              type="color"
+              aria-label="Brand colour"
+              className="h-10 w-14 rounded-lg border border-edge-strong bg-panel cursor-pointer"
+              value={isHexColor(doc.brandColor) ? doc.brandColor : '#4F46E5'}
+              onChange={(e) => patchDoc({ brandColor: e.target.value })}
+              data-testid="brand-color"
+            />
             <button
               type="button"
-              data-testid="logo-button"
-              className="btn btn-ghost w-full justify-start"
-              onClick={() => {
-                if (!isPro) {
-                  openUpgrade('your own logo');
-                  return;
-                }
-                fileRef.current?.click();
-              }}
+              className="btn btn-ghost text-xs"
+              onClick={() => patchDoc({ brandColor: null })}
+              disabled={!doc.brandColor}
             >
-              {isPro ? <IconUpload className="w-3.5 h-3.5" /> : <IconLock className="w-3.5 h-3.5" />}
-              {isPro ? 'Upload a logo' : 'Add your logo'}
-              {!isPro && <span className="ml-auto text-xs text-brand font-semibold">Pro</span>}
+              Use template default
             </button>
-          )}
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            className="hidden"
-            onChange={(e) => {
-              onLogoPicked(e.target.files?.[0]);
-              e.target.value = '';
-            }}
-          />
+          </div>
         </div>
+
+        {isPro && (
+          <label className="mt-4 pt-3 border-t border-edge flex items-start gap-2.5 text-sm">
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={!doc.showCredit}
+              onChange={(e) => patchDoc({ showCredit: !e.target.checked })}
+              data-testid="hide-credit"
+            />
+            <span>
+              <span className="font-semibold">Remove footer credit</span>
+              <span className="block text-xs text-muted mt-0.5">
+                Hide “Made with makefastquote.com” on exported PDFs.
+              </span>
+            </span>
+          </label>
+        )}
+
+        <button type="button" className="btn btn-ghost mt-4 text-xs" onClick={rememberProfile}>
+          Save as my default profile
+        </button>
       </Section>
 
       <Section title="Client details">
@@ -266,27 +273,40 @@ export function FormPanel() {
       </Section>
 
       <Section
-        title={doc.kind === 'invoice' ? 'Payment terms' : 'Notes & terms'}
+        title="Payment / banking"
         hint={
           doc.kind === 'invoice'
-            ? 'Bank details, payment window, late fees.'
+            ? 'IBAN, SWIFT, and the terms that sit under the total.'
             : 'Scope, schedule, how long the quote stands.'
         }
       >
-        <textarea
-          className="field resize-y min-h-[6rem]"
-          value={doc.notes}
-          placeholder={
-            doc.kind === 'invoice'
-              ? 'Payment due within 30 days. Bank: …'
-              : 'This proposal is valid for 30 days. 50% due on acceptance.'
-          }
-          onChange={(e) => patchDoc({ notes: e.target.value })}
-          aria-label="Notes and terms"
+        <Field
+          label="Bank details"
+          area
+          value={doc.issuer.bank}
+          onChange={(v) => patchParty('issuer', { bank: v })}
+          placeholder="IBAN · SWIFT / BIC"
         />
+        <div className="mt-3">
+          <label className="label" htmlFor="notes-terms">
+            {doc.kind === 'invoice' ? 'Payment terms' : 'Notes & terms'}
+          </label>
+          <textarea
+            id="notes-terms"
+            className="field resize-y min-h-[6rem]"
+            value={doc.notes}
+            placeholder={
+              doc.kind === 'invoice'
+                ? 'Payment due within 30 days.'
+                : 'This proposal is valid for 30 days. 50% due on acceptance.'
+            }
+            onChange={(e) => patchDoc({ notes: e.target.value })}
+            aria-label="Notes and terms"
+          />
+        </div>
       </Section>
 
-      <Section title="Signature">
+      <Section title="Signature & sign-off" hint="Draw, or upload a photo of a signature.">
         <SignaturePad
           strokes={doc.signature}
           onChange={setSignature}
@@ -302,6 +322,16 @@ export function FormPanel() {
           />
         </div>
       </Section>
+
+      {!isPro && (doc.logo || doc.brandColor) && (
+        <p className="text-xs text-muted px-1">
+          The canvas is showing your branding. Downloading the PDF will ask you to unlock Pro — or
+          you can export without the logo.{' '}
+          <button type="button" className="text-brand font-semibold underline" onClick={() => openUpgrade('logo-export')}>
+            Unlock Pro — {PRICE.display}
+          </button>
+        </p>
+      )}
     </div>
   );
 }

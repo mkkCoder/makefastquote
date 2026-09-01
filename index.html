@@ -252,7 +252,14 @@
         box-shadow: var(--shadow);
         overflow: hidden;
         background: #fff;
-        transform: rotate(-1.1deg);
+        /*
+         * DELIBERATELY SQUARE. This carried a -1.1deg tilt to look casual; it
+         * read as a bug instead. A rotation that small is too slight to be
+         * taken as a deliberate angle and large enough that the eye notices
+         * the horizontals are off — and on a product whose whole pitch is that
+         * the totals match the rows and the preview is the file, a crooked
+         * page argues against the copy next to it. Precision is the point.
+         */
         /* Roughly the top two-thirds of A4 — where the content actually is. */
         aspect-ratio: 210 / 196;
       }
@@ -266,11 +273,6 @@
         height: 5rem;
         background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
         pointer-events: none;
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .doc-frame {
-          transform: none;
-        }
       }
       .doc {
         display: block;

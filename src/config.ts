@@ -59,7 +59,13 @@ export const LICENSE_VENDOR = {
  *
  * SET THIS BEFORE LAUNCH. Until it contains a real store URL the buy button
  * falls back to the "how to buy" panel instead of opening a broken checkout.
- * Format: https://<store>.lemonsqueezy.com/buy/<variant-uuid>
+ * Format: https://<store>.lemonsqueezy.com/checkout/buy/<variant-id>
+ *
+ * Note `/checkout/buy/`, not `/buy/`. Lemon Squeezy's docs are explicit that
+ * shareable checkout URLs always contain `/checkout/buy/`; copy the link
+ * straight out of the product's Share dialog rather than assembling it by hand.
+ * Opening such a URL converts it into a single-use cart URL, which is normal
+ * and is why the link you land on does not match the one you configured.
  */
 export const CHECKOUT_URL = '';
 

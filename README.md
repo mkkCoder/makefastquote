@@ -250,7 +250,9 @@ because people learn to re-run it.
 These are the things nobody else can do for you.
 
 1. **Set `CHECKOUT_URL` in `src/config.ts`** to your Lemon Squeezy product URL
-   (`https://<store>.lemonsqueezy.com/buy/<variant-uuid>`). Until you do, the
+   (`https://<store>.lemonsqueezy.com/checkout/buy/<variant-id>` — note
+   `/checkout/buy/`, not `/buy/`; copy it from the product's Share dialog).
+   Until you do, the
    buy button shows a "not connected yet" note instead of opening a broken
    checkout. Enable licence keys on the product in Lemon Squeezy.
 

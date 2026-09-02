@@ -288,6 +288,16 @@ These are the things nobody else can do for you.
    has it. The preview is SVG, so this is the one browser difference most likely
    to show up.
 
+8. **Google Search Console.** Add `https://makefastquote.com/` as a URL-prefix
+   property, verify (HTML file or DNS TXT), then submit
+   `https://makefastquote.com/sitemap.xml`. Request indexing of the homepage.
+   Confirm `https://makefastquote.com/og.png` returns 200 so social previews work.
+
+9. **www → apex.** After Pages HTTPS is enforced, add a redirect so
+   `https://www.makefastquote.com/` does not compete with the canonical apex.
+   GitHub Pages does not do this for you; use the registrar or a DNS host that
+   supports HTTPS redirects.
+
 ## The one number to watch
 
 **Export attempts ÷ licence activations.** Everything else is vanity. If people

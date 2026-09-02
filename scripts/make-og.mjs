@@ -44,8 +44,8 @@ const html = `<!doctype html><meta charset="utf-8"><style>
              font-size:18px;color:#9aa1ad;white-space:nowrap}
 </style>
 <div class="row"><div class="mark">Q</div><div class="dom">makefastquote.com</div></div>
-<h1>Proposals and invoices that look like a real business sent them.</h1>
-<p>Free, no sign-up, and nothing you type leaves your browser.</p>
+<h1>Free invoice and proposal generator</h1>
+<p>A searchable A4 PDF in minutes. No sign-up, and nothing you type leaves your browser.</p>
 <div class="pill"><span>A4 PDF</span><span>No account</span><span>$29 once for Pro</span></div>`;
 
 const browser = await chromium.launch(

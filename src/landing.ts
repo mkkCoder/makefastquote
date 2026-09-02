@@ -21,7 +21,7 @@ function renderDoc(
   if (el) {
     el.classList.add('doc');
     el.setAttribute('role', 'img');
-    el.setAttribute('aria-label', 'Live invoice preview');
+    el.setAttribute('aria-label', 'Live invoice preview generated in the browser');
   }
 }
 
@@ -121,6 +121,9 @@ function bootShowcase(): void {
   document.querySelectorAll<HTMLButtonElement>('[data-align]').forEach((btn) => {
     btn.addEventListener('click', () => {
       align = (btn.dataset.align as LogoAlign) || 'left';
+      document.querySelectorAll<HTMLButtonElement>('[data-align]').forEach((b) => {
+        b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+      });
       paint();
     });
   });

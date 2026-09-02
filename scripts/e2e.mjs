@@ -171,6 +171,12 @@ await check('landing page renders and links to the editor', async () => {
     assert(await page.locator('h1').isVisible(), 'no visible h1');
     const title = await page.title();
     assert(/proposal/i.test(title), `title does not mention proposals: ${title}`);
+    assert(/invoice/i.test(title), `title does not mention invoices: ${title}`);
+    assert(title.length <= 60, `title is ${title.length} characters (want ≤60): ${title}`);
+    const desc = await page.locator('meta[name="description"]').getAttribute('content');
+    assert(desc && desc.length <= 155, `meta description is ${desc?.length ?? 0} characters`);
+    const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+    assert(canonical === 'https://makefastquote.com/', `canonical is ${canonical}`);
     // Relative, not absolute — the same build has to work at an apex domain
     // and at a project subpath. See the base note in vite.config.ts.
     assert(
@@ -184,9 +190,14 @@ await check('landing page renders and links to the editor', async () => {
     // The hero must actually show a document, not an empty frame.
     const heroDoc = await page.locator('.doc-frame svg').count();
     assert(heroDoc === 1, `expected 1 hero document SVG, found ${heroDoc}`);
+    const h1Count = await page.locator('h1').count();
+    assert(h1Count === 1, `expected exactly 1 h1, found ${h1Count}`);
     // Structured data must be valid JSON or search engines silently drop it.
     const ld = await page.locator('script[type="application/ld+json"]').textContent();
-    JSON.parse(ld);
+    const graph = JSON.parse(ld);
+    const types = JSON.stringify(graph);
+    assert(types.includes('SoftwareApplication'), 'JSON-LD missing SoftwareApplication');
+    assert(types.includes('FAQPage'), 'JSON-LD missing FAQPage');
     await page.screenshot({ path: join(shots, '01-landing.png'), fullPage: true });
   });
   assertNoConsoleErrors(errors);

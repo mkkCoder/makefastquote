@@ -3,53 +3,154 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>MakeFastQuote — free proposal &amp; invoice generator for freelancers</title>
+    <title>Free Invoice &amp; Proposal Generator | MakeFastQuote</title>
     <meta
       name="description"
-      content="Write a proposal or invoice and download a clean A4 PDF in about two minutes. Free, no sign-up, and nothing you type ever leaves your browser."
+      content="Create a freelance invoice or proposal and download a searchable A4 PDF in minutes. Free, no sign-up — nothing you type leaves your browser."
     />
     <link rel="canonical" href="https://makefastquote.com/" />
+    <link rel="sitemap" type="application/xml" href="https://makefastquote.com/sitemap.xml" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./favicon.svg" />
     <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+    <meta name="robots" content="index, follow" />
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MakeFastQuote" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:url" content="https://makefastquote.com/" />
-    <meta property="og:title" content="Free proposal &amp; invoice generator for freelancers" />
+    <meta property="og:title" content="Free Invoice &amp; Proposal Generator | MakeFastQuote" />
     <meta
       property="og:description"
-      content="A clean A4 PDF in two minutes. No sign-up, no upload — it all runs in your browser."
+      content="Create a freelance invoice or proposal and download a searchable A4 PDF in minutes. Free, no sign-up — nothing you type leaves your browser."
     />
     <meta property="og:image" content="https://makefastquote.com/og.png" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="MakeFastQuote: free invoice and proposal generator with a live A4 PDF preview"
+    />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Free Invoice &amp; Proposal Generator | MakeFastQuote" />
+    <meta
+      name="twitter:description"
+      content="Create a freelance invoice or proposal and download a searchable A4 PDF in minutes. Free, no sign-up."
+    />
+    <meta name="twitter:image" content="https://makefastquote.com/og.png" />
+    <meta
+      name="twitter:image:alt"
+      content="MakeFastQuote: free invoice and proposal generator with a live A4 PDF preview"
+    />
+    <meta name="twitter:url" content="https://makefastquote.com/" />
 
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "MakeFastQuote",
-        "url": "https://makefastquote.com/",
-        "applicationCategory": "BusinessApplication",
-        "operatingSystem": "Any modern browser",
-        "description": "Proposal and invoice generator for freelancers. Runs entirely in the browser — no account, no upload, no server.",
-        "offers": [
-          { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free" },
+        "@graph": [
           {
-            "@type": "Offer",
-            "price": "29",
-            "priceCurrency": "USD",
-            "name": "Pro — one-time lifetime unlock"
+            "@type": ["SoftwareApplication", "WebApplication"],
+            "name": "MakeFastQuote",
+            "url": "https://makefastquote.com/",
+            "image": "https://makefastquote.com/og.png",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web browser",
+            "browserRequirements": "Requires JavaScript. Runs in any modern browser.",
+            "isAccessibleForFree": true,
+            "description": "Free invoice and proposal generator for freelancers. Create a searchable A4 PDF in the browser — no account, no upload, no server.",
+            "featureList": [
+              "Unlimited invoices and proposals",
+              "Searchable A4 PDF export",
+              "Live preview that matches the downloaded file",
+              "Per-line tax, discounts, and signatures",
+              "CSV and JSON export of your data",
+              "Client-side only — documents never leave the browser"
+            ],
+            "offers": [
+              {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD",
+                "name": "Free",
+                "description": "Unlimited documents, PDF export, and data export"
+              },
+              {
+                "@type": "Offer",
+                "price": "29",
+                "priceCurrency": "USD",
+                "name": "Pro — one-time lifetime unlock",
+                "description": "Logo, brand colour, studio templates, no footer credit"
+              }
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "name": "MakeFastQuote",
+            "url": "https://makefastquote.com/"
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Do I need an account?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. There is nowhere to sign up, because there is no server to sign up to."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Where are my documents stored?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "In your browser, on this device. They survive a refresh and are waiting tomorrow — but they don't follow you to another computer, and clearing browser data clears them. Export to CSV or JSON if you want a copy you keep."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What does Pro actually change?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Your logo, brand colour, three more templates, and the footer credit comes off. Everything else is in the free version and stays there."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Which currencies and languages?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Ten currencies, and per-line tax rates covering VAT, GST and sales tax. The PDF font covers Latin-script languages; Hebrew, Arabic and CJK aren't supported yet."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I generate a quote or proposal as well as an invoice?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Switch the document type to proposal or invoice. The same layout engine builds the page and the PDF."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is the PDF searchable text or just an image?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Real, selectable text. Your client can copy bank details from the file. The preview and the PDF are drawn from one model, so they match."
+                }
+              }
+            ]
           }
         ]
       }
     </script>
 
     <!--
-      All CSS is inlined and there is no JavaScript, so the first paint is a
-      single round trip. That is most of what a 95+ Lighthouse score costs on a
-      page like this — and this page's whole job is being found.
+      All CSS is inlined. Landing interactivity is a deferred module, so the
+      first paint is HTML + CSS in one round trip — which is most of what a
+      95+ Lighthouse score costs on a page whose job is being found.
 
       The hero document is inline SVG generated by the app's OWN renderer
       (scripts/make-hero.mjs), so the picture cannot drift from the product.
@@ -219,13 +320,23 @@
         }
       }
 
+      .skip {
+        position: absolute;
+        left: 0.75rem;
+        top: 0.75rem;
+        z-index: 40;
+        transform: translateY(-160%);
+      }
+      .skip:focus {
+        transform: none;
+      }
       h1 {
         font-size: clamp(2.25rem, 4vw, 3.25rem);
         line-height: 1.08;
         letter-spacing: -0.03em;
         font-weight: 700;
         margin: 0 0 1.25rem;
-        max-width: 18ch;
+        max-width: 16ch;
       }
       .lede {
         font-size: 1.16rem;
@@ -455,6 +566,13 @@
         max-width: 60ch;
         font-size: 0.95rem;
       }
+      summary h3 {
+        margin: 0;
+        font-size: inherit;
+        font-weight: inherit;
+        letter-spacing: inherit;
+        line-height: inherit;
+      }
 
       /* ── closing + footer ───────────────────────────────────────────── */
       .closer {
@@ -559,6 +677,7 @@
     </style>
   </head>
   <body>
+    <a class="skip btn btn-primary btn-sm" href="#main">Skip to content</a>
     <header>
       <div class="wrap bar">
         <span class="mark" aria-hidden="true">Q</span>
@@ -568,14 +687,15 @@
       </div>
     </header>
 
-    <main>
+    <main id="main">
       <section class="hero">
         <div class="wrap hero-grid">
           <div>
-            <h1>Proposals and invoices that look like a real business sent them.</h1>
+            <h1>Free invoice and proposal generator</h1>
             <p class="lede">
-              Fill in the form, watch the page build itself, download the PDF. No sign-up, and
-              nothing you type leaves your browser.
+              Proposals and invoices that look like a real business sent them. Fill in the form,
+              watch the page build itself, download the PDF. No sign-up, and nothing you type
+              leaves your browser.
             </p>
             <div class="cta-row">
               <a class="btn btn-primary" href="./app/">Make one now — free</a>
@@ -603,9 +723,9 @@
                 <input id="sandbox-tax" value="0" inputmode="decimal" autocomplete="off" />
               </div>
             </form>
-            <div class="doc-frame">
+            <div class="doc-frame" aria-hidden="false">
               <!--HERO_DOC_START-->
-<svg class="doc" role="img" aria-label="An example invoice produced by the tool" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297" font-family="Helvetica, Arial, 'Liberation Sans', sans-serif"><rect x="0" y="0" width="210" height="297" fill="#ffffff"></rect><rect x="0" y="0" width="210" height="6" fill="#4f46e5"></rect><text x="16" y="23" font-size="5.292" fill="#0f172a" text-anchor="start" font-weight="700" xml:space="preserve">Studio Meridian</text><text x="16" y="28" font-size="2.999" fill="#64748b" text-anchor="start" xml:space="preserve">hello@studiomeridian.com</text><text x="194" y="25" font-size="10.583" fill="#4f46e5" text-anchor="end" font-weight="700" letter-spacing="0.6" xml:space="preserve">INVOICE</text><text x="162" y="32" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Reference</text><text x="194" y="32" font-size="2.999" fill="#0f172a" text-anchor="end" xml:space="preserve">2026-014</text><text x="162" y="36.6" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Issued</text><text x="194" y="36.6" font-size="2.999" fill="#0f172a" text-anchor="end" xml:space="preserve">2026-09-01</text><text x="162" y="41.2" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Due</text><text x="194" y="41.2" font-size="2.999" fill="#0f172a" text-anchor="end" xml:space="preserve">2026-10-01</text><line x1="16" y1="51.8" x2="194" y2="51.8" stroke="#4f46e5" stroke-width="0.5"></line><text x="16" y="59.8" font-size="2.822" fill="#64748b" text-anchor="start" xml:space="preserve">Bill to</text><text x="16" y="64.8" font-size="3.881" fill="#0f172a" text-anchor="start" font-weight="700" xml:space="preserve">Northwind Coffee Co.</text><text x="16" y="69.8" font-size="2.999" fill="#64748b" text-anchor="start" xml:space="preserve">Dana Alvarez</text><text x="16" y="73.8" font-size="2.999" fill="#64748b" text-anchor="start" xml:space="preserve">dana@northwind.coffee</text><rect x="16" y="78.6" width="178" height="8" fill="#eef2ff"></rect><text x="18" y="83.8" font-size="2.822" fill="#64748b" text-anchor="start" font-weight="700" xml:space="preserve">Description</text><text x="124" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Qty</text><text x="156" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Unit</text><text x="174" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Tax</text><text x="194" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Amount</text><line x1="16" y1="86.8" x2="194" y2="86.8" stroke="#4f46e5" stroke-width="0.5"></line><text x="18" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="start" xml:space="preserve">Brand identity — logo, palette, type scale</text><text x="124" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">1</text><text x="156" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$2,400.00</text><text x="174" y="91.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">—</text><text x="194" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="end" font-weight="700" xml:space="preserve">$2,400.00</text><rect x="16" y="94.4" width="178" height="7" fill="#f8fafc"></rect><text x="18" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="start" xml:space="preserve">Packaging design (hours)</text><text x="124" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">14</text><text x="156" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$95.00</text><text x="174" y="98.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">—</text><text x="194" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="end" font-weight="700" xml:space="preserve">$1,330.00</text><text x="18" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="start" xml:space="preserve">Print-ready artwork</text><text x="124" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">1</text><text x="156" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$350.00</text><text x="174" y="105.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">—</text><text x="194" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="end" font-weight="700" xml:space="preserve">$350.00</text><line x1="116" y1="114.8" x2="194" y2="114.8" stroke="#4f46e5" stroke-width="0.5"></line><text x="154" y="120.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">Subtotal</text><text x="194" y="120.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$4,080.00</text><line x1="116" y1="123.3" x2="194" y2="123.3" stroke="#4f46e5" stroke-width="0.5"></line><text x="154" y="127.9" font-size="3.704" fill="#4f46e5" text-anchor="end" font-weight="700" xml:space="preserve">Total due</text><text x="194" y="127.9" font-size="4.233" fill="#4f46e5" text-anchor="end" font-weight="700" xml:space="preserve">$4,080.00</text><text x="16" y="140.9" font-size="2.822" fill="#64748b" text-anchor="start" xml:space="preserve">Payment terms</text><text x="16" y="145.9" font-size="2.999" fill="#0f172a" text-anchor="start" xml:space="preserve">Payment due within 30 days.</text><line x1="132" y1="163.9" x2="194" y2="163.9" stroke="#64748b" stroke-width="0.3"></line><text x="194" y="168.4" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Ana Reyes</text></svg>
+<svg class="doc" role="img" aria-label="Example freelance invoice PDF generated by MakeFastQuote, showing line items, tax, and a total due" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297" font-family="Helvetica, Arial, 'Liberation Sans', sans-serif"><rect x="0" y="0" width="210" height="297" fill="#ffffff"></rect><rect x="0" y="0" width="210" height="6" fill="#4f46e5"></rect><text x="16" y="23" font-size="5.292" fill="#0f172a" text-anchor="start" font-weight="700" xml:space="preserve">Studio Meridian</text><text x="16" y="28" font-size="2.999" fill="#64748b" text-anchor="start" xml:space="preserve">hello@studiomeridian.com</text><text x="194" y="25" font-size="10.583" fill="#4f46e5" text-anchor="end" font-weight="700" letter-spacing="0.6" xml:space="preserve">INVOICE</text><text x="162" y="32" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Reference</text><text x="194" y="32" font-size="2.999" fill="#0f172a" text-anchor="end" xml:space="preserve">2026-014</text><text x="162" y="36.6" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Issued</text><text x="194" y="36.6" font-size="2.999" fill="#0f172a" text-anchor="end" xml:space="preserve">2026-09-01</text><text x="162" y="41.2" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Due</text><text x="194" y="41.2" font-size="2.999" fill="#0f172a" text-anchor="end" xml:space="preserve">2026-10-01</text><line x1="16" y1="51.8" x2="194" y2="51.8" stroke="#4f46e5" stroke-width="0.5"></line><text x="16" y="59.8" font-size="2.822" fill="#64748b" text-anchor="start" xml:space="preserve">Bill to</text><text x="16" y="64.8" font-size="3.881" fill="#0f172a" text-anchor="start" font-weight="700" xml:space="preserve">Northwind Coffee Co.</text><text x="16" y="69.8" font-size="2.999" fill="#64748b" text-anchor="start" xml:space="preserve">Dana Alvarez</text><text x="16" y="73.8" font-size="2.999" fill="#64748b" text-anchor="start" xml:space="preserve">dana@northwind.coffee</text><rect x="16" y="78.6" width="178" height="8" fill="#eef2ff"></rect><text x="18" y="83.8" font-size="2.822" fill="#64748b" text-anchor="start" font-weight="700" xml:space="preserve">Description</text><text x="124" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Qty</text><text x="156" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Unit</text><text x="174" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Tax</text><text x="194" y="83.8" font-size="2.822" fill="#64748b" text-anchor="end" font-weight="700" xml:space="preserve">Amount</text><line x1="16" y1="86.8" x2="194" y2="86.8" stroke="#4f46e5" stroke-width="0.5"></line><text x="18" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="start" xml:space="preserve">Brand identity — logo, palette, type scale</text><text x="124" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">1</text><text x="156" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$2,400.00</text><text x="174" y="91.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">—</text><text x="194" y="91.8" font-size="3.175" fill="#0f172a" text-anchor="end" font-weight="700" xml:space="preserve">$2,400.00</text><rect x="16" y="94.4" width="178" height="7" fill="#f8fafc"></rect><text x="18" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="start" xml:space="preserve">Packaging design (hours)</text><text x="124" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">14</text><text x="156" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$95.00</text><text x="174" y="98.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">—</text><text x="194" y="98.8" font-size="3.175" fill="#0f172a" text-anchor="end" font-weight="700" xml:space="preserve">$1,330.00</text><text x="18" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="start" xml:space="preserve">Print-ready artwork</text><text x="124" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">1</text><text x="156" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$350.00</text><text x="174" y="105.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">—</text><text x="194" y="105.8" font-size="3.175" fill="#0f172a" text-anchor="end" font-weight="700" xml:space="preserve">$350.00</text><line x1="116" y1="114.8" x2="194" y2="114.8" stroke="#4f46e5" stroke-width="0.5"></line><text x="154" y="120.8" font-size="3.175" fill="#64748b" text-anchor="end" xml:space="preserve">Subtotal</text><text x="194" y="120.8" font-size="3.175" fill="#0f172a" text-anchor="end" xml:space="preserve">$4,080.00</text><line x1="116" y1="123.3" x2="194" y2="123.3" stroke="#4f46e5" stroke-width="0.5"></line><text x="154" y="127.9" font-size="3.704" fill="#4f46e5" text-anchor="end" font-weight="700" xml:space="preserve">Total due</text><text x="194" y="127.9" font-size="4.233" fill="#4f46e5" text-anchor="end" font-weight="700" xml:space="preserve">$4,080.00</text><text x="16" y="140.9" font-size="2.822" fill="#64748b" text-anchor="start" xml:space="preserve">Payment terms</text><text x="16" y="145.9" font-size="2.999" fill="#0f172a" text-anchor="start" xml:space="preserve">Payment due within 30 days.</text><line x1="132" y1="163.9" x2="194" y2="163.9" stroke="#64748b" stroke-width="0.3"></line><text x="194" y="168.4" font-size="2.822" fill="#64748b" text-anchor="end" xml:space="preserve">Ana Reyes</text></svg>
 <!--HERO_DOC_END-->
             </div>
             <p class="doc-caption">Try it — this is the real layout engine, in the page.</p>
@@ -615,22 +735,22 @@
 
       <section class="wrap" id="templates">
         <p class="eyebrow">Templates</p>
-        <h2>Default, Minimal, or Studio Modern — with your logo where you want it.</h2>
-        <div class="seg">
-          <button type="button" data-template="standard">Default</button>
-          <button type="button" data-template="minimalist">Minimal</button>
-          <button type="button" data-template="modern" aria-current="true">Studio Modern</button>
+        <h2>Invoice templates with your logo where you want it.</h2>
+        <div class="seg" role="group" aria-label="Invoice template and logo options">
+          <button type="button" data-template="standard" aria-label="Default invoice template">Default</button>
+          <button type="button" data-template="minimalist" aria-label="Minimal invoice template">Minimal</button>
+          <button type="button" data-template="modern" aria-current="true" aria-label="Studio Modern invoice template">Studio Modern</button>
           <button type="button" id="toggle-logo" aria-pressed="true">Logo on</button>
-          <button type="button" data-align="left">Logo left</button>
-          <button type="button" data-align="center">Logo center</button>
-          <button type="button" data-align="right">Logo right</button>
+          <button type="button" data-align="left" aria-pressed="true">Logo left</button>
+          <button type="button" data-align="center" aria-pressed="false">Logo center</button>
+          <button type="button" data-align="right" aria-pressed="false">Logo right</button>
         </div>
         <div class="template-frame" id="template-preview"></div>
       </section>
 
-      <section class="wrap">
+      <section class="wrap" id="features">
         <p class="eyebrow">Why it's different</p>
-        <h2>Most invoice tools hand you a picture of an invoice.</h2>
+        <h2>Most invoice generators hand you a picture of an invoice.</h2>
         <div class="points">
           <div class="point">
             <h3>The preview is the file</h3>
@@ -669,9 +789,37 @@
         </div>
       </section>
 
+      <section class="wrap" id="use-cases">
+        <p class="eyebrow">Who it's for</p>
+        <h2>A free invoice generator for people who send their own paperwork.</h2>
+        <div class="points">
+          <div class="point">
+            <h3>Freelancers invoicing a client</h3>
+            <p>
+              Turn hours and deliverables into a clean invoice PDF without creating an account or
+              uploading a client list to someone else's server.
+            </p>
+          </div>
+          <div class="point">
+            <h3>Agencies sending a project proposal</h3>
+            <p>
+              Scope, line items, and totals on one page that looks finished — then the same tool
+              becomes the invoice when the work is done.
+            </p>
+          </div>
+          <div class="point">
+            <h3>Consultants quoting scoped work</h3>
+            <p>
+              Tax, discounts, and a signature line that adds up in cents. Export CSV or JSON if you
+              keep books elsewhere.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section class="wrap" id="pricing">
         <p class="eyebrow">Pricing</p>
-        <h2>Free is genuinely free. Pro is $29, once.</h2>
+        <h2>Free invoice PDFs. Pro is $29, once.</h2>
         <div class="price">
           <div class="tier">
             <h3>Free</h3>
@@ -702,16 +850,16 @@
         </div>
       </section>
 
-      <section class="wrap">
+      <section class="wrap" id="faq">
         <p class="eyebrow">Questions</p>
-        <h2>The things people ask.</h2>
+        <h2>Invoice and proposal generator FAQ</h2>
         <div class="faq-list">
         <details>
-          <summary>Do I need an account?</summary>
+          <summary><h3>Do I need an account?</h3></summary>
           <p>No. There is nowhere to sign up, because there is no server to sign up to.</p>
         </details>
         <details>
-          <summary>Where are my documents stored?</summary>
+          <summary><h3>Where are my documents stored?</h3></summary>
           <p>
             In your browser, on this device. They survive a refresh and are waiting tomorrow — but
             they don't follow you to another computer, and clearing browser data clears them.
@@ -719,17 +867,31 @@
           </p>
         </details>
         <details>
-          <summary>What does Pro actually change?</summary>
+          <summary><h3>What does Pro actually change?</h3></summary>
           <p>
             Your logo, brand colour, three more templates, and the footer credit comes off.
             Everything else is in the free version and stays there.
           </p>
         </details>
         <details>
-          <summary>Which currencies and languages?</summary>
+          <summary><h3>Which currencies and languages?</h3></summary>
           <p>
             Ten currencies, and per-line tax rates covering VAT, GST and sales tax. The PDF font
             covers Latin-script languages; Hebrew, Arabic and CJK aren't supported yet.
+          </p>
+        </details>
+        <details>
+          <summary><h3>Can I generate a quote or proposal as well as an invoice?</h3></summary>
+          <p>
+            Yes. Switch the document type to proposal or invoice. The same layout engine builds the
+            page and the PDF.
+          </p>
+        </details>
+        <details>
+          <summary><h3>Is the PDF searchable text or just an image?</h3></summary>
+          <p>
+            Real, selectable text. Your client can copy bank details from the file. The preview and
+            the PDF are drawn from one model, so they match.
           </p>
         </details>
         </div>
@@ -744,8 +906,8 @@
     <footer>
       <div class="wrap">
         <p style="margin: 0">
-          makefastquote.com — a free proposal and invoice generator that runs entirely in your
-          browser.
+          makefastquote.com — a free invoice and proposal generator that runs entirely in your
+          browser. No account, no upload.
         </p>
       </div>
     </footer>

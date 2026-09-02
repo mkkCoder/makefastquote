@@ -46,7 +46,7 @@ export function LogoUploader() {
           <div className="flex items-center gap-3">
             <img
               src={doc.logo}
-              alt="Your logo"
+              alt="Your company logo for this invoice"
               className="h-12 max-w-40 object-contain bg-white rounded border border-edge p-1"
             />
             <button type="button" className="btn btn-ghost text-xs" onClick={() => setLogo(null)}>

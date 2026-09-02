@@ -7,7 +7,7 @@ export const SITE = {
   domain: 'makefastquote.com',
   url: 'https://makefastquote.com',
   name: 'MakeFastQuote',
-  tagline: 'Proposals and invoices that look like a real business sent them.',
+  tagline: 'Free invoice and proposal generator',
 } as const;
 
 /** Price in whole units of `currency`. Referenced by every piece of copy. */

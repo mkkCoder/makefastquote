@@ -103,6 +103,7 @@ export function Header() {
               type="button"
               className="btn btn-ghost"
               onClick={() => setDataMenu((v) => !v)}
+              aria-label="Export document data"
               aria-expanded={dataMenu}
               aria-haspopup="menu"
               data-testid="data-menu"

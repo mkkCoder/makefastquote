@@ -21,8 +21,8 @@ describe('visualOrder', () => {
     expect(visualOrder('בע"מ')).toBe('מ"עב');
   });
 
-  it('places the first Hebrew word on the right in an RTL paragraph', () => {
-    expect(visualOrder('ההצעה תקפה', 'rtl')).toBe('הפקת העצהה');
+  it('keeps typed Hebrew word order so the first word stays on the left', () => {
+    expect(visualOrder('ההצעה תקפה')).toBe('העצהה הפקת');
   });
 });
 
@@ -78,6 +78,7 @@ describe('layout keeps English chrome', () => {
     if (name?.t === 'text') {
       expect(name.x).toBeLessThan(PAGE.w / 2);
       expect(name.align).toBe('left');
+      expect(name.text.startsWith('םולש')).toBe(true);
     }
   });
 

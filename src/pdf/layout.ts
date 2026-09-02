@@ -2,7 +2,7 @@ import type { DocumentState, Stroke } from '../types';
 import { computeTotals, formatMoney, currencySymbol } from '../lib/money';
 import { TEMPLATES, type Template } from './templates';
 import { measureText, wrapText, truncateToWidth, fitFontSize, type FontWeight } from './text';
-import { visualOrder, paragraphDirFor, needsUnicodeFont } from './unicodeFont';
+import { visualOrder, needsUnicodeFont } from './unicodeFont';
 import { SITE } from '../config';
 import { clampScale } from '../lib/logo';
 import { isHexColor, mixHex } from '../lib/color';
@@ -188,7 +188,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       t: 'text',
       x,
       y: yy,
-      text: visualOrder(t, paragraphDirFor(t)),
+      text: visualOrder(t),
       size,
       weight: opts.weight ?? 'normal',
       color: opts.color ?? tpl.ink,

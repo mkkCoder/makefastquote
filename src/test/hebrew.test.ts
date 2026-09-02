@@ -21,8 +21,9 @@ describe('visualOrder', () => {
     expect(visualOrder('בע"מ')).toBe('מ"עב');
   });
 
-  it('keeps typed Hebrew word order so the first word stays on the left', () => {
-    expect(visualOrder('ההצעה תקפה')).toBe('העצהה הפקת');
+  it('places the first Hebrew word on the right in an RTL paragraph', () => {
+    expect(visualOrder('ההצעה תקפה', 'rtl')).toBe('הפקת העצהה');
+    expect(visualOrder('מעוז קלרמן', 'rtl')).toBe('ןמרלק זועמ');
   });
 });
 
@@ -58,10 +59,10 @@ describe('patchCidOrdering', () => {
 });
 
 describe('layout keeps English chrome', () => {
-  it('keeps the issuer on the left when the name is Hebrew', () => {
+  it('puts the Hebrew issuer on the right without reversing the name', () => {
     const doc = demoDocument({
       issuer: {
-        name: 'שלום סטודיו',
+        name: 'מעוז קלרמן',
         contact: '',
         email: '',
         phone: '',
@@ -71,14 +72,12 @@ describe('layout keeps English chrome', () => {
       },
     });
     const { pages } = layoutDocument({ doc, isPro: true });
-    const name = pages[0]?.ops.find(
-      (op) => op.t === 'text' && (op.text.includes('םולש') || op.text.includes('וידוטס')),
-    );
+    const name = pages[0]?.ops.find((op) => op.t === 'text' && op.text.includes('זועמ'));
     expect(name?.t).toBe('text');
     if (name?.t === 'text') {
-      expect(name.x).toBeLessThan(PAGE.w / 2);
-      expect(name.align).toBe('left');
-      expect(name.text.startsWith('םולש')).toBe(true);
+      expect(name.x).toBeGreaterThan(PAGE.w / 2);
+      expect(name.align).toBe('right');
+      expect(name.text).toBe(visualOrder('מעוז קלרמן', 'rtl'));
     }
   });
 

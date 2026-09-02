@@ -2,7 +2,7 @@ import type { DocumentState, Stroke } from '../types';
 import { computeTotals, formatMoney, currencySymbol } from '../lib/money';
 import { TEMPLATES, type Template } from './templates';
 import { measureText, wrapText, truncateToWidth, fitFontSize, type FontWeight } from './text';
-import { visualOrder, needsUnicodeFont } from './unicodeFont';
+import { visualOrder, paragraphDirFor, needsUnicodeFont } from './unicodeFont';
 import { SITE } from '../config';
 import { clampScale } from '../lib/logo';
 import { isHexColor, mixHex } from '../lib/color';
@@ -188,7 +188,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       t: 'text',
       x,
       y: yy,
-      text: visualOrder(t),
+      text: visualOrder(t, paragraphDirFor(t)),
       size,
       weight: opts.weight ?? 'normal',
       color: opts.color ?? tpl.ink,
@@ -215,9 +215,33 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
     y = Math.max(y, tpl.bandHeight + 12);
   }
 
-  // Issuer identity block, top-left. Logo is a Pro feature; the free tier gets
-  // the business name set large, which is a real design, not a punishment.
+  // Title + metadata, top-left. Issuer identity sits opposite, top-right.
   const identityTop = y;
+  const rightX = PAGE.w - MARGIN.right;
+  const titleText = tpl.titleUpper ? L.title.toUpperCase() : L.title;
+  text(titleText, MARGIN.left, identityTop + 7, tpl.titleSize, {
+    weight: tpl.titleWeight,
+    color: tpl.accent,
+    tracking: tpl.titleTracking,
+  });
+
+  const meta: Array<[string, string]> = [
+    [L.reference, doc.reference || '—'],
+    [L.issued, doc.issueDate || '—'],
+    [L.due, doc.dueDate || '—'],
+  ];
+  let my = identityTop + 14;
+  for (const [label, value] of meta) {
+    text(label, MARGIN.left, my, 8, {
+      color: tpl.muted,
+      weight: tpl.labelStyle === 'italic' ? 'italic' : 'normal',
+    });
+    text(trunc(value, 30, 8.5), MARGIN.left + 32, my, 8.5);
+    my += 4.6;
+  }
+
+  // Logo is a Pro feature; the free tier gets the business name set large,
+  // which is a real design, not a punishment.
   let identityBottom: number;
 
   if (showLogo && doc.logo) {
@@ -233,17 +257,18 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       h = w / aspect;
     }
     const colW = CONTENT_W * 0.5;
-    let x = MARGIN.left;
-    if (doc.logoAlign === 'center') x = MARGIN.left + Math.max(0, (colW - w) / 2);
-    if (doc.logoAlign === 'right') x = MARGIN.left + Math.max(0, colW - w);
-    ops.push({ t: 'image', x, y, w, h, src: doc.logo });
-    identityBottom = y + h + 4;
+    const colLeft = rightX - colW;
+    let x = colLeft;
+    if (doc.logoAlign === 'center') x = colLeft + Math.max(0, (colW - w) / 2);
+    if (doc.logoAlign === 'right') x = rightX - w;
+    ops.push({ t: 'image', x, y: identityTop, w, h, src: doc.logo });
+    identityBottom = identityTop + h + 4;
   } else {
     const name = doc.issuer.name || 'Your business';
     // Fit, do not guess: a long business name must not run into the title.
     const size = fit(name, CONTENT_W * 0.52, 15);
-    text(name, MARGIN.left, y + 5, size, { weight: 'bold' });
-    identityBottom = y + 9;
+    text(name, rightX, identityTop + 5, size, { weight: 'bold', align: 'right' });
+    identityBottom = identityTop + 9;
   }
 
   const issuerLines = [
@@ -258,33 +283,8 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
 
   let iy = identityBottom + 1;
   for (const line of issuerLines) {
-    text(trunc(line, CONTENT_W * 0.5, 8.5), MARGIN.left, iy, 8.5, { color: tpl.muted });
+    text(trunc(line, CONTENT_W * 0.5, 8.5), rightX, iy, 8.5, { color: tpl.muted, align: 'right' });
     iy += 4;
-  }
-
-  // Title + metadata, top-right.
-  const titleText = tpl.titleUpper ? L.title.toUpperCase() : L.title;
-  text(titleText, PAGE.w - MARGIN.right, identityTop + 7, tpl.titleSize, {
-    weight: tpl.titleWeight,
-    color: tpl.accent,
-    align: 'right',
-    tracking: tpl.titleTracking,
-  });
-
-  const meta: Array<[string, string]> = [
-    [L.reference, doc.reference || '—'],
-    [L.issued, doc.issueDate || '—'],
-    [L.due, doc.dueDate || '—'],
-  ];
-  let my = identityTop + 14;
-  for (const [label, value] of meta) {
-    text(label, PAGE.w - MARGIN.right - 32, my, 8, {
-      color: tpl.muted,
-      align: 'right',
-      weight: tpl.labelStyle === 'italic' ? 'italic' : 'normal',
-    });
-    text(trunc(value, 30, 8.5), PAGE.w - MARGIN.right, my, 8.5, { align: 'right' });
-    my += 4.6;
   }
 
   y = Math.max(iy, my) + 6;

@@ -26,6 +26,20 @@ describe('layoutDocument', () => {
     ).toContain('INVOICE');
   });
 
+  it('puts the document title on the left and the issuer on the right', () => {
+    const ops = allOps(layoutDocument({ doc: doc(), isPro: false }).pages);
+    const title = ops.find((o): o is Extract<Op, { t: 'text' }> => o.t === 'text' && o.text === 'PROPOSAL');
+    const issuer = ops.find(
+      (o): o is Extract<Op, { t: 'text' }> => o.t === 'text' && o.text === 'Jane Doe Design',
+    );
+    expect(title).toBeDefined();
+    expect(issuer).toBeDefined();
+    expect(title!.x).toBe(MARGIN.left);
+    expect(title!.align).toBe('left');
+    expect(issuer!.x).toBe(PAGE.w - MARGIN.right);
+    expect(issuer!.align).toBe('right');
+  });
+
   it('keeps every drawn element inside the page', () => {
     const { pages } = layoutDocument({ doc: doc(), isPro: false });
     for (const op of allOps(pages)) {

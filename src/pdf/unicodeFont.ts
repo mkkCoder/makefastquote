@@ -26,17 +26,28 @@ export function needsUnicodeFont(text: string): boolean {
   return !helveticaCanEncode(text);
 }
 
+export type ParagraphDir = 'ltr' | 'rtl';
+
+/** Hebrew-only user text uses RTL visual order; mixed Latin+Hebrew stays LTR. */
+export function paragraphDirFor(text: string): ParagraphDir {
+  if (!hasHebrew(text)) return 'ltr';
+  if (/[A-Za-z]/.test(text)) return 'ltr';
+  return 'rtl';
+}
+
 /**
  * Visual order for a left-to-right draw call (jsPDF and SVG with bidi-override).
  *
- * The invoice/proposal chrome is LTR (title and amounts on the right, body
- * starting on the left). Reverse each Hebrew run so ש sits on the right of
- * שלום, but keep typed word order so the first word stays on the left —
- * not at the line end, which is what a full-line RTL flip would do.
+ * LTR paragraph: reverse each Hebrew run so ש is on the right of שלום.
+ * RTL paragraph: reverse the whole line, then restore Latin/digit runs so
+ * "10" stays 10 and the first Hebrew word sits on the right — מעוז קלרמן
+ * must still read מעוז קלרמן, not קלרמן מעוז.
  */
-export function visualOrder(text: string): string {
+export function visualOrder(text: string, dir: ParagraphDir = 'ltr'): string {
   if (!HEBREW.test(text)) return text;
-  return text.replace(HEBREW_RUN, reverseGraphemes);
+  if (dir === 'ltr') return text.replace(HEBREW_RUN, reverseGraphemes);
+  const flipped = reverseGraphemes(text);
+  return flipped.replace(/[0-9A-Za-z.,:+\-%/$€£¥₹₪]+/g, reverseGraphemes);
 }
 
 function reverseGraphemes(run: string): string {

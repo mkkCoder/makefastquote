@@ -53,8 +53,13 @@ function measureUnicode(text: string, sizePt: number, weight: FontWeight): numbe
   return units * sizePt * (25.4 / 72);
 }
 
-export function measureText(text: string, sizePt: number, weight: FontWeight = 'normal'): number {
-  if (needsUnicodeFont(text)) return measureUnicode(text, sizePt, weight);
+export function measureText(
+  text: string,
+  sizePt: number,
+  weight: FontWeight = 'normal',
+  forceUnicode = false,
+): number {
+  if (forceUnicode || needsUnicodeFont(text)) return measureUnicode(text, sizePt, weight);
 
   const face = faceKey(weight);
   const table = WIDTHS[face];
@@ -93,9 +98,11 @@ export function wrapText(
   maxWidthMm: number,
   sizePt: number,
   weight: FontWeight = 'normal',
+  forceUnicode = false,
 ): string[] {
   if (!text) return [];
   const out: string[] = [];
+  const width = (s: string) => measureText(s, sizePt, weight, forceUnicode);
 
   for (const paragraph of text.split(/\r?\n/)) {
     if (paragraph.trim() === '') {
@@ -105,19 +112,18 @@ export function wrapText(
     let line = '';
     for (const word of paragraph.split(/\s+/).filter(Boolean)) {
       const candidate = line ? `${line} ${word}` : word;
-      if (measureText(candidate, sizePt, weight) <= maxWidthMm) {
+      if (width(candidate) <= maxWidthMm) {
         line = candidate;
         continue;
       }
       if (line) out.push(line);
-      if (measureText(word, sizePt, weight) <= maxWidthMm) {
+      if (width(word) <= maxWidthMm) {
         line = word;
         continue;
       }
-      // Word alone overflows: break it by character.
       let chunk = '';
       for (const ch of word) {
-        if (measureText(chunk + ch, sizePt, weight) > maxWidthMm && chunk) {
+        if (width(chunk + ch) > maxWidthMm && chunk) {
           out.push(chunk);
           chunk = ch;
         } else {
@@ -137,12 +143,13 @@ export function truncateToWidth(
   maxWidthMm: number,
   sizePt: number,
   weight: FontWeight = 'normal',
+  forceUnicode = false,
 ): string {
-  if (measureText(text, sizePt, weight) <= maxWidthMm) return text;
+  if (measureText(text, sizePt, weight, forceUnicode) <= maxWidthMm) return text;
   const ellipsis = '...';
   let out = '';
   for (const ch of text) {
-    if (measureText(out + ch + ellipsis, sizePt, weight) > maxWidthMm) break;
+    if (measureText(out + ch + ellipsis, sizePt, weight, forceUnicode) > maxWidthMm) break;
     out += ch;
   }
   return out ? out + ellipsis : '';
@@ -162,11 +169,11 @@ export function fitFontSize(
   maxWidthMm: number,
   maxPt: number,
   minPt = 4,
+  forceUnicode = false,
 ): number {
   if (!text) return maxPt;
-  const naturalWidth = measureText(text, maxPt);
+  const naturalWidth = measureText(text, maxPt, 'normal', forceUnicode);
   if (naturalWidth <= maxWidthMm) return maxPt;
-  // Width scales linearly with point size, so this is exact, not a search.
   const scaled = (maxPt * maxWidthMm) / naturalWidth;
   return Math.max(minPt, Math.floor(scaled * 100) / 100);
 }

@@ -56,18 +56,20 @@ async function unicodeFontBytes(): Promise<{ regular: ArrayBuffer; bold: ArrayBu
   return fontCache;
 }
 
-function fontFor(op: Extract<Op, { t: 'text' }>): { family: string; style: string } {
-  if (!needsUnicodeFont(op.text)) {
-    return { family: 'helvetica', style: styleFor(op.weight) };
-  }
+function fontFor(
+  op: Extract<Op, { t: 'text' }>,
+  useUnicode: boolean,
+): { family: string; style: string } {
+  const unicode = useUnicode || needsUnicodeFont(op.text);
+  if (!unicode) return { family: 'helvetica', style: styleFor(op.weight) };
   return { family: UNICODE_FONT, style: op.weight === 'bold' ? 'bold' : 'normal' };
 }
 
-function drawOp(pdf: PdfDoc, op: Op): void {
+function drawOp(pdf: PdfDoc, op: Op, useUnicode: boolean): void {
   switch (op.t) {
     case 'text': {
       const [r, g, b] = hexToRgb(op.color);
-      const { family, style } = fontFor(op);
+      const { family, style } = fontFor(op, useUnicode);
       pdf.setTextColor(r, g, b);
       pdf.setFont(family, style);
       pdf.setFontSize(op.size);
@@ -150,11 +152,13 @@ export async function buildPdf({ doc, isPro }: RenderOptions): Promise<Blob> {
   });
 
   const ops = pages.flatMap((p) => p.ops);
-  const unicodeOps = ops.filter((op): op is Extract<Op, { t: 'text' }> => op.t === 'text' && needsUnicodeFont(op.text));
-  if (unicodeOps.length) {
+  const unicodeOps = ops.filter(
+    (op): op is Extract<Op, { t: 'text' }> => op.t === 'text' && needsUnicodeFont(op.text),
+  );
+  const useUnicode = unicodeOps.length > 0;
+  if (useUnicode) {
     const { regular, bold } = await unicodeFontBytes();
-    const needBold = unicodeOps.some((op) => op.weight === 'bold');
-    addUnicodeFonts(pdf, regular, needBold ? bold : null);
+    addUnicodeFonts(pdf, regular, bold);
   }
 
   pdf.setProperties({
@@ -166,7 +170,7 @@ export async function buildPdf({ doc, isPro }: RenderOptions): Promise<Blob> {
 
   pages.forEach((page, i) => {
     if (i > 0) pdf.addPage([PAGE.w, PAGE.h], 'portrait');
-    for (const op of page.ops) drawOp(pdf, op);
+    for (const op of page.ops) drawOp(pdf, op, useUnicode);
   });
 
   const raw = pdf.output('arraybuffer');

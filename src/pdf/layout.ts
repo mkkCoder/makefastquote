@@ -1,8 +1,8 @@
 import type { DocumentState, Stroke } from '../types';
-import { computeTotals, formatMoney } from '../lib/money';
+import { computeTotals, formatMoney, currencySymbol } from '../lib/money';
 import { TEMPLATES, type Template } from './templates';
 import { measureText, wrapText, truncateToWidth, fitFontSize, type FontWeight } from './text';
-import { visualOrder } from './unicodeFont';
+import { visualOrder, hasHebrew, needsUnicodeFont } from './unicodeFont';
 import { SITE } from '../config';
 import { clampScale } from '../lib/logo';
 import { isHexColor, mixHex } from '../lib/color';
@@ -101,6 +101,90 @@ const COLUMNS = {
 
 const rightEdge = (c: { x: number; w: number }) => c.x + c.w;
 
+function documentIsRtl(doc: DocumentState): boolean {
+  const parts = [
+    doc.issuer.name,
+    doc.issuer.contact,
+    doc.issuer.address,
+    doc.issuer.bank,
+    doc.client.name,
+    doc.client.contact,
+    doc.client.address,
+    doc.notes,
+    doc.signatureName,
+    ...doc.items.map((i) => i.description),
+  ];
+  return parts.some((s) => Boolean(s && hasHebrew(s)));
+}
+
+function documentNeedsUnicode(doc: DocumentState): boolean {
+  return documentIsRtl(doc) || needsUnicodeFont(currencySymbol(doc.currency));
+}
+
+function mirrorOps(ops: Op[]): Op[] {
+  return ops.map((op) => {
+    switch (op.t) {
+      case 'text':
+        return {
+          ...op,
+          x: PAGE.w - op.x,
+          align: op.align === 'left' ? 'right' : op.align === 'right' ? 'left' : 'center',
+        };
+      case 'line':
+        return { ...op, x1: PAGE.w - op.x1, x2: PAGE.w - op.x2 };
+      case 'rect':
+        return { ...op, x: PAGE.w - op.x - op.w };
+      case 'image':
+        return { ...op, x: PAGE.w - op.x - op.w };
+      case 'path':
+        return { ...op, pts: op.pts.map(([x, y]) => [PAGE.w - x, y] as const) };
+    }
+  });
+}
+
+function labels(rtl: boolean, kind: DocumentState['kind']) {
+  if (!rtl) {
+    return {
+      title: kind === 'invoice' ? 'Invoice' : 'Proposal',
+      billTo: kind === 'invoice' ? 'Bill to' : 'Prepared for',
+      description: 'Description',
+      qty: 'Qty',
+      unit: 'Unit',
+      tax: 'Tax',
+      amount: 'Amount',
+      subtotal: 'Subtotal',
+      discount: (n: string) => `Discount (${n}%)`,
+      taxLine: (n: string) => `Tax ${n}%`,
+      total: kind === 'invoice' ? 'Total due' : 'Total',
+      notes: kind === 'invoice' ? 'Payment terms' : 'Notes & terms',
+      empty: 'No line items yet.',
+      reference: 'Reference',
+      issued: kind === 'invoice' ? 'Issued' : 'Date',
+      due: kind === 'invoice' ? 'Due' : 'Valid until',
+      taxId: (id: string) => `Tax ID ${id}`,
+    };
+  }
+  return {
+    title: kind === 'invoice' ? 'חשבונית' : 'הצעת מחיר',
+    billTo: kind === 'invoice' ? 'לכבוד' : 'הוכן עבור',
+    description: 'תיאור',
+    qty: 'כמות',
+    unit: 'מחיר',
+    tax: 'מע"מ',
+    amount: 'סכום',
+    subtotal: 'ביניים',
+    discount: (n: string) => `הנחה (${n}%)`,
+    taxLine: (n: string) => `מע"מ ${n}%`,
+    total: kind === 'invoice' ? 'סה"כ לתשלום' : 'סה"כ',
+    notes: kind === 'invoice' ? 'תנאי תשלום' : 'הערות ותנאים',
+    empty: 'אין שורות עדיין.',
+    reference: 'אסמכתא',
+    issued: kind === 'invoice' ? 'הופק' : 'תאריך',
+    due: kind === 'invoice' ? 'לתשלום עד' : 'בתוקף עד',
+    taxId: (id: string) => `ח.פ. ${id}`,
+  };
+}
+
 /** Signature strokes are stored 0..1; map them into a box on the page. */
 function strokeToPage(
   stroke: Stroke,
@@ -113,11 +197,20 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
   const branded = isPro || preview;
   const tpl = resolveTemplate(doc, branded);
   const showLogo = Boolean(doc.logo) && branded;
+  const rtl = documentIsRtl(doc);
+  const unicode = documentNeedsUnicode(doc);
+  const dir = rtl ? 'rtl' : 'ltr';
+  const L = labels(rtl, doc.kind);
   const pages: LaidOutPage[] = [];
   let ops: Op[] = [];
-  // Annotated: MARGIN is `as const`, so an inferred `y` would be the literal
-  // type 18 and every later assignment a type error.
   let y: number = MARGIN.top;
+
+  const fit = (t: string, maxW: number, maxPt: number, minPt = 4) =>
+    fitFontSize(t, maxW, maxPt, minPt, unicode);
+  const trunc = (t: string, maxW: number, size: number, weight: FontWeight = 'normal') =>
+    truncateToWidth(t, maxW, size, weight, unicode);
+  const wrap = (t: string, maxW: number, size: number, weight: FontWeight = 'normal') =>
+    wrapText(t, maxW, size, weight, unicode);
 
   const newPage = () => {
     pages.push({ ops });
@@ -142,7 +235,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       t: 'text',
       x,
       y: yy,
-      text: visualOrder(t),
+      text: visualOrder(t, dir),
       size,
       weight: opts.weight ?? 'normal',
       color: opts.color ?? tpl.ink,
@@ -195,7 +288,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
   } else {
     const name = doc.issuer.name || 'Your business';
     // Fit, do not guess: a long business name must not run into the title.
-    const size = fitFontSize(name, CONTENT_W * 0.52, 15);
+    const size = fit(name, CONTENT_W * 0.52, 15);
     text(name, MARGIN.left, y + 5, size, { weight: 'bold' });
     identityBottom = y + 9;
   }
@@ -205,20 +298,19 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
     doc.issuer.contact,
     doc.issuer.email,
     doc.issuer.phone,
-    doc.issuer.taxId ? `Tax ID ${doc.issuer.taxId}` : '',
+    doc.issuer.taxId ? L.taxId(doc.issuer.taxId) : '',
     doc.issuer.bank,
     ...(doc.issuer.address ? doc.issuer.address.split(/\r?\n/) : []),
   ].filter(Boolean);
 
   let iy = identityBottom + 1;
   for (const line of issuerLines) {
-    text(truncateToWidth(line, CONTENT_W * 0.5, 8.5), MARGIN.left, iy, 8.5, { color: tpl.muted });
+    text(trunc(line, CONTENT_W * 0.5, 8.5), MARGIN.left, iy, 8.5, { color: tpl.muted });
     iy += 4;
   }
 
   // Title + metadata, top-right.
-  const title = doc.kind === 'invoice' ? 'Invoice' : 'Proposal';
-  const titleText = tpl.titleUpper ? title.toUpperCase() : title;
+  const titleText = rtl ? L.title : tpl.titleUpper ? L.title.toUpperCase() : L.title;
   text(titleText, PAGE.w - MARGIN.right, identityTop + 7, tpl.titleSize, {
     weight: tpl.titleWeight,
     color: tpl.accent,
@@ -227,9 +319,9 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
   });
 
   const meta: Array<[string, string]> = [
-    ['Reference', doc.reference || '—'],
-    [doc.kind === 'invoice' ? 'Issued' : 'Date', doc.issueDate || '—'],
-    [doc.kind === 'invoice' ? 'Due' : 'Valid until', doc.dueDate || '—'],
+    [L.reference, doc.reference || '—'],
+    [L.issued, doc.issueDate || '—'],
+    [L.due, doc.dueDate || '—'],
   ];
   let my = identityTop + 14;
   for (const [label, value] of meta) {
@@ -238,7 +330,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       align: 'right',
       weight: tpl.labelStyle === 'italic' ? 'italic' : 'normal',
     });
-    text(truncateToWidth(value, 30, 8.5), PAGE.w - MARGIN.right, my, 8.5, { align: 'right' });
+    text(trunc(value, 30, 8.5), PAGE.w - MARGIN.right, my, 8.5, { align: 'right' });
     my += 4.6;
   }
 
@@ -254,7 +346,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
   }
 
   // Client block.
-  text(doc.kind === 'invoice' ? 'Bill to' : 'Prepared for', MARGIN.left, y, 8, {
+  text(L.billTo, MARGIN.left, y, 8, {
     color: tpl.muted,
     weight: tpl.labelStyle === 'italic' ? 'italic' : 'normal',
   });
@@ -270,12 +362,12 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
 
   const clientHeadSize = 11;
   const firstClientLine = clientLines[0] ?? '—';
-  text(truncateToWidth(firstClientLine, CONTENT_W * 0.55, clientHeadSize, 'bold'), MARGIN.left, y, clientHeadSize, {
+  text(trunc(firstClientLine, CONTENT_W * 0.55, clientHeadSize, 'bold'), MARGIN.left, y, clientHeadSize, {
     weight: 'bold',
   });
   y += 5;
   for (const line of clientLines.slice(1)) {
-    text(truncateToWidth(line, CONTENT_W * 0.55, 8.5), MARGIN.left, y, 8.5, { color: tpl.muted });
+    text(trunc(line, CONTENT_W * 0.55, 8.5), MARGIN.left, y, 8.5, { color: tpl.muted });
     y += 4;
   }
   y += 6;
@@ -297,18 +389,18 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
         fill: tpl.headFill,
       });
     }
-    text('Description', COLUMNS.desc.x + (tpl.headFill ? 2 : 0), y, 8, {
+    text(L.description, COLUMNS.desc.x + (tpl.headFill ? 2 : 0), y, 8, {
       weight: 'bold',
       color: tpl.ink,
     });
-    text('Qty', rightEdge(COLUMNS.qty), y, 8, { weight: 'bold', color: tpl.ink, align: 'right' });
-    text('Unit', rightEdge(COLUMNS.price), y, 8, {
+    text(L.qty, rightEdge(COLUMNS.qty), y, 8, { weight: 'bold', color: tpl.ink, align: 'right' });
+    text(L.unit, rightEdge(COLUMNS.price), y, 8, {
       weight: 'bold',
       color: tpl.ink,
       align: 'right',
     });
-    text('Tax', rightEdge(COLUMNS.tax), y, 8, { weight: 'bold', color: tpl.ink, align: 'right' });
-    text('Amount', rightEdge(COLUMNS.total), y, 8, {
+    text(L.tax, rightEdge(COLUMNS.tax), y, 8, { weight: 'bold', color: tpl.ink, align: 'right' });
+    text(L.amount, rightEdge(COLUMNS.total), y, 8, {
       weight: 'bold',
       color: tpl.ink,
       align: 'right',
@@ -324,7 +416,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
   let zebraIndex = 0;
 
   for (const item of items) {
-    const descLines = wrapText(item.description || '—', COLUMNS.desc.w - 2, 9);
+    const descLines = wrap(item.description || '—', COLUMNS.desc.w - 2, 9);
     const rowH = Math.max(ROW_MIN_H, descLines.length * 4.2 + 2.8);
 
     if (y + rowH > PAGE.h - MARGIN.bottom - FOOTER_RESERVE) {
@@ -368,7 +460,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
   }
 
   if (items.length === 0) {
-    text('No line items yet.', COLUMNS.desc.x, y, 9, { color: tpl.muted });
+    text(L.empty, COLUMNS.desc.x, y, 9, { color: tpl.muted });
     y += ROW_MIN_H;
   }
 
@@ -376,23 +468,19 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
 
   const totals = computeTotals(doc.items, doc.discount);
   const totalsRows: Array<[string, string, boolean]> = [
-    ['Subtotal', formatMoney(totals.subtotal, doc.currency), false],
+    [L.subtotal, formatMoney(totals.subtotal, doc.currency), false],
   ];
   if (totals.discount > 0) {
     totalsRows.push([
-      `Discount (${trimNum(doc.discount)}%)`,
+      L.discount(trimNum(doc.discount)),
       `-${formatMoney(totals.discount, doc.currency)}`,
       false,
     ]);
   }
   for (const t of totals.taxByRate) {
-    totalsRows.push([`Tax ${trimNum(t.rate)}%`, formatMoney(t.amount, doc.currency), false]);
+    totalsRows.push([L.taxLine(trimNum(t.rate)), formatMoney(t.amount, doc.currency), false]);
   }
-  totalsRows.push([
-    doc.kind === 'invoice' ? 'Total due' : 'Total',
-    formatMoney(totals.total, doc.currency),
-    true,
-  ]);
+  totalsRows.push([L.total, formatMoney(totals.total, doc.currency), true]);
 
   const totalsH = totalsRows.length * 5.6 + 6;
   if (y + totalsH > PAGE.h - MARGIN.bottom - FOOTER_RESERVE) newPage();
@@ -423,14 +511,14 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
 
   // ----------------------------------------------------------- notes + sig
 
-  const notesLines = doc.notes ? wrapText(doc.notes, CONTENT_W * 0.58, 8.5) : [];
+  const notesLines = doc.notes ? wrap(doc.notes, CONTENT_W * 0.58, 8.5) : [];
   const sigBoxH = 20;
   const blockH = Math.max(notesLines.length * 4 + 10, sigBoxH + 12);
 
   if (y + blockH > PAGE.h - MARGIN.bottom - FOOTER_RESERVE) newPage();
 
   if (notesLines.length) {
-    text(doc.kind === 'invoice' ? 'Payment terms' : 'Notes & terms', MARGIN.left, y, 8, {
+    text(L.notes, MARGIN.left, y, 8, {
       color: tpl.muted,
       weight: tpl.labelStyle === 'italic' ? 'italic' : 'normal',
     });
@@ -533,7 +621,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       const credit = `Made with ${SITE.domain}`;
       // Fit the credit line rather than trusting a hardcoded size: the domain
       // is a variable, and the day it gets longer this would silently overrun.
-      const size = fitFontSize(credit, 60, 7.5);
+      const size = fit(credit, 60, 7.5);
       pageOps.push({
         t: 'text',
         x: MARGIN.left,
@@ -547,6 +635,10 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       });
     }
   });
+
+  if (rtl) {
+    for (const page of pages) page.ops = mirrorOps(page.ops);
+  }
 
   return { pages };
 }

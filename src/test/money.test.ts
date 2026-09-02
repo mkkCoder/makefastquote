@@ -58,11 +58,8 @@ describe('money', () => {
     expect(computeTotals([item(1, 100)], -50).total).toBe(10000);
   });
 
-  it('formats money without Intl separators the PDF font cannot render', () => {
-    const s = formatMoney(123456789, 'USD');
-    expect(s).toBe('$1,234,567.89');
-    // No non-breaking space or other non-WinAnsi character.
-    expect(/^[\x20-\xFF]+$/.test(s)).toBe(true);
+  it('formats ILS with a real shekel sign', () => {
+    expect(formatMoney(32400, 'ILS')).toBe('₪324.00');
   });
 
   it('formats negatives with the sign before the symbol', () => {

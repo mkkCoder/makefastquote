@@ -1,28 +1,45 @@
 import type { jsPDF } from 'jspdf';
+import { EXTRA_WIDTHS, METRIC_HIGH, METRIC_LOW } from './metrics';
 
 export const UNICODE_FONT = 'NotoSansHebrew';
 
-/** Hebrew block, including niqqud. Anything in here cannot be WinAnsi. */
 const HEBREW = /[\u0590-\u05FF]/;
+/** Hebrew plus gershayim/geresh so בע"מ stays one run. */
+const HEBREW_RUN = /[\u0590-\u05FF]+(?:["\u05F3\u05F4\u201C\u201D][\u0590-\u05FF]+)*/gu;
 
-export function needsUnicodeFont(text: string): boolean {
+export function hasHebrew(text: string): boolean {
   return HEBREW.test(text);
 }
 
+export function helveticaCanEncode(text: string): boolean {
+  const extra = EXTRA_WIDTHS['helvetica-normal'];
+  for (let i = 0; i < text.length; i++) {
+    const c = text.charCodeAt(i);
+    if (c >= METRIC_LOW && c <= METRIC_HIGH) continue;
+    if (extra[String(c)] !== undefined) continue;
+    return false;
+  }
+  return true;
+}
+
+export function needsUnicodeFont(text: string): boolean {
+  return !helveticaCanEncode(text);
+}
+
+export type ParagraphDir = 'ltr' | 'rtl';
+
 /**
- * Visual order for a left-to-right draw call.
+ * Visual order for a left-to-right draw call (jsPDF and SVG with bidi-override).
  *
- * jsPDF and SVG both paint characters from the x origin toward the right.
- * Hebrew letters are stored logically (first letter first). Without reversing
- * each Hebrew run, ש appears on the left and the word reads backwards.
- *
- * Reverse grapheme clusters, not code units, so niqqud stays on its letter.
- * Latin, digits and punctuation in the same string stay put — that is the
- * usual LTR-invoice case: "Studio מרidian" / "סכום 1,200".
+ * LTR paragraph: reverse each Hebrew run so ש is on the right of שלום.
+ * RTL paragraph: reverse the whole line, then restore Latin/digit runs so
+ * "10" stays 10 and the first Hebrew word sits on the right.
  */
-export function visualOrder(text: string): string {
+export function visualOrder(text: string, dir: ParagraphDir = 'ltr'): string {
   if (!HEBREW.test(text)) return text;
-  return text.replace(/[\u0590-\u05FF]+/gu, reverseGraphemes);
+  if (dir === 'ltr') return text.replace(HEBREW_RUN, reverseGraphemes);
+  const flipped = reverseGraphemes(text);
+  return flipped.replace(/[0-9A-Za-z.,:+\-%/$€£¥₹₪]+/g, reverseGraphemes);
 }
 
 function reverseGraphemes(run: string): string {

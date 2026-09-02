@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { measureText } from '../pdf/text';
-import { patchCidOrdering, visualOrder } from '../pdf/unicodeFont';
-import { layoutDocument } from '../pdf/layout';
+import { needsUnicodeFont, patchCidOrdering, visualOrder } from '../pdf/unicodeFont';
+import { layoutDocument, PAGE } from '../pdf/layout';
 import { demoDocument } from '../lib/demoDoc';
 
 describe('visualOrder', () => {
@@ -13,8 +13,16 @@ describe('visualOrder', () => {
     expect(visualOrder('שלום')).toBe('םולש');
   });
 
-  it('reverses only the Hebrew run in mixed text', () => {
+  it('reverses only the Hebrew run in mixed LTR text', () => {
     expect(visualOrder('Hello שלום')).toBe('Hello םולש');
+  });
+
+  it('keeps gershayim inside a Hebrew abbreviation', () => {
+    expect(visualOrder('בע"מ')).toBe('מ"עב');
+  });
+
+  it('places the first Hebrew word on the right in an RTL paragraph', () => {
+    expect(visualOrder('ההצעה תקפה', 'rtl')).toBe('הפקת העצהה');
   });
 });
 
@@ -29,6 +37,11 @@ describe('Hebrew measurement', () => {
 
   it('makes bold Hebrew wider than regular', () => {
     expect(measureText('שלום', 10, 'bold')).toBeGreaterThan(measureText('שלום', 10));
+  });
+
+  it('sends shekel amounts through the Unicode font, not Helvetica', () => {
+    expect(needsUnicodeFont('₪324.00')).toBe(true);
+    expect(measureText('₪324.00', 9)).toBeGreaterThan(8);
   });
 });
 
@@ -45,7 +58,7 @@ describe('patchCidOrdering', () => {
 });
 
 describe('layout emits visual Hebrew', () => {
-  it('puts reversed Hebrew in the drawing ops', () => {
+  it('mirrors a Hebrew document to the right side of the page', () => {
     const doc = demoDocument({
       issuer: {
         name: 'שלום סטודיו',
@@ -58,8 +71,31 @@ describe('layout emits visual Hebrew', () => {
       },
     });
     const { pages } = layoutDocument({ doc, isPro: true });
+    const name = pages[0]?.ops.find(
+      (op) => op.t === 'text' && (op.text.includes('םולש') || op.text.includes('וידוטס')),
+    );
+    expect(name?.t).toBe('text');
+    if (name?.t === 'text') {
+      expect(name.x).toBeGreaterThan(PAGE.w / 2);
+      expect(name.align).toBe('right');
+    }
+  });
+
+  it('uses a Hebrew title on a Hebrew proposal', () => {
+    const doc = demoDocument({
+      kind: 'proposal',
+      client: {
+        name: 'אסף',
+        contact: '',
+        email: '',
+        phone: '',
+        address: '',
+        taxId: '',
+        bank: '',
+      },
+    });
+    const { pages } = layoutDocument({ doc, isPro: true });
     const texts = pages.flatMap((p) => p.ops.filter((op) => op.t === 'text').map((op) => op.text));
-    expect(texts.some((t) => t.includes('םולש'))).toBe(true);
-    expect(texts.some((t) => t.includes('שלום'))).toBe(false);
+    expect(texts.some((t) => t.includes('ריחמ תעצה') || t.includes('הצעת מחיר'))).toBe(true);
   });
 });

@@ -28,6 +28,13 @@ export function needsUnicodeFont(text: string): boolean {
 
 export type ParagraphDir = 'ltr' | 'rtl';
 
+/** Hebrew-only user text uses RTL visual order; mixed Latin+Hebrew stays LTR. */
+export function paragraphDirFor(text: string): ParagraphDir {
+  if (!hasHebrew(text)) return 'ltr';
+  if (/[A-Za-z]/.test(text)) return 'ltr';
+  return 'rtl';
+}
+
 /**
  * Visual order for a left-to-right draw call (jsPDF and SVG with bidi-override).
  *

@@ -57,8 +57,8 @@ describe('patchCidOrdering', () => {
   });
 });
 
-describe('layout emits visual Hebrew', () => {
-  it('mirrors a Hebrew document to the right side of the page', () => {
+describe('layout keeps English chrome', () => {
+  it('keeps the issuer on the left when the name is Hebrew', () => {
     const doc = demoDocument({
       issuer: {
         name: 'שלום סטודיו',
@@ -76,12 +76,12 @@ describe('layout emits visual Hebrew', () => {
     );
     expect(name?.t).toBe('text');
     if (name?.t === 'text') {
-      expect(name.x).toBeGreaterThan(PAGE.w / 2);
-      expect(name.align).toBe('right');
+      expect(name.x).toBeLessThan(PAGE.w / 2);
+      expect(name.align).toBe('left');
     }
   });
 
-  it('uses a Hebrew title on a Hebrew proposal', () => {
+  it('keeps English titles when the client name is Hebrew', () => {
     const doc = demoDocument({
       kind: 'proposal',
       client: {
@@ -96,6 +96,7 @@ describe('layout emits visual Hebrew', () => {
     });
     const { pages } = layoutDocument({ doc, isPro: true });
     const texts = pages.flatMap((p) => p.ops.filter((op) => op.t === 'text').map((op) => op.text));
-    expect(texts.some((t) => t.includes('ריחמ תעצה') || t.includes('הצעת מחיר'))).toBe(true);
+    expect(texts.some((t) => t.includes('PROPOSAL') || t === 'Proposal')).toBe(true);
+    expect(texts.some((t) => t.includes('הצעת') || t.includes('ריחמ'))).toBe(false);
   });
 });

@@ -2,7 +2,7 @@ import type { DocumentState, Stroke } from '../types';
 import { computeTotals, formatMoney, currencySymbol } from '../lib/money';
 import { TEMPLATES, type Template } from './templates';
 import { measureText, wrapText, truncateToWidth, fitFontSize, type FontWeight } from './text';
-import { visualOrder, hasHebrew, needsUnicodeFont } from './unicodeFont';
+import { visualOrder, paragraphDirFor, needsUnicodeFont } from './unicodeFont';
 import { SITE } from '../config';
 import { clampScale } from '../lib/logo';
 import { isHexColor, mixHex } from '../lib/color';
@@ -101,7 +101,8 @@ const COLUMNS = {
 
 const rightEdge = (c: { x: number; w: number }) => c.x + c.w;
 
-function documentIsRtl(doc: DocumentState): boolean {
+function documentNeedsUnicode(doc: DocumentState): boolean {
+  if (needsUnicodeFont(currencySymbol(doc.currency))) return true;
   const parts = [
     doc.issuer.name,
     doc.issuer.contact,
@@ -114,74 +115,28 @@ function documentIsRtl(doc: DocumentState): boolean {
     doc.signatureName,
     ...doc.items.map((i) => i.description),
   ];
-  return parts.some((s) => Boolean(s && hasHebrew(s)));
+  return parts.some((s) => Boolean(s && needsUnicodeFont(s)));
 }
 
-function documentNeedsUnicode(doc: DocumentState): boolean {
-  return documentIsRtl(doc) || needsUnicodeFont(currencySymbol(doc.currency));
-}
-
-function mirrorOps(ops: Op[]): Op[] {
-  return ops.map((op) => {
-    switch (op.t) {
-      case 'text':
-        return {
-          ...op,
-          x: PAGE.w - op.x,
-          align: op.align === 'left' ? 'right' : op.align === 'right' ? 'left' : 'center',
-        };
-      case 'line':
-        return { ...op, x1: PAGE.w - op.x1, x2: PAGE.w - op.x2 };
-      case 'rect':
-        return { ...op, x: PAGE.w - op.x - op.w };
-      case 'image':
-        return { ...op, x: PAGE.w - op.x - op.w };
-      case 'path':
-        return { ...op, pts: op.pts.map(([x, y]) => [PAGE.w - x, y] as const) };
-    }
-  });
-}
-
-function labels(rtl: boolean, kind: DocumentState['kind']) {
-  if (!rtl) {
-    return {
-      title: kind === 'invoice' ? 'Invoice' : 'Proposal',
-      billTo: kind === 'invoice' ? 'Bill to' : 'Prepared for',
-      description: 'Description',
-      qty: 'Qty',
-      unit: 'Unit',
-      tax: 'Tax',
-      amount: 'Amount',
-      subtotal: 'Subtotal',
-      discount: (n: string) => `Discount (${n}%)`,
-      taxLine: (n: string) => `Tax ${n}%`,
-      total: kind === 'invoice' ? 'Total due' : 'Total',
-      notes: kind === 'invoice' ? 'Payment terms' : 'Notes & terms',
-      empty: 'No line items yet.',
-      reference: 'Reference',
-      issued: kind === 'invoice' ? 'Issued' : 'Date',
-      due: kind === 'invoice' ? 'Due' : 'Valid until',
-      taxId: (id: string) => `Tax ID ${id}`,
-    };
-  }
+function labels(kind: DocumentState['kind']) {
   return {
-    title: kind === 'invoice' ? 'חשבונית' : 'הצעת מחיר',
-    billTo: kind === 'invoice' ? 'לכבוד' : 'הוכן עבור',
-    description: 'תיאור',
-    qty: 'כמות',
-    unit: 'מחיר',
-    tax: 'מע"מ',
-    amount: 'סכום',
-    subtotal: 'ביניים',
-    discount: (n: string) => `הנחה (${n}%)`,
-    taxLine: (n: string) => `מע"מ ${n}%`,
-    total: kind === 'invoice' ? 'סה"כ לתשלום' : 'סה"כ',
-    notes: kind === 'invoice' ? 'תנאי תשלום' : 'הערות ותנאים',
-    empty: 'אין שורות עדיין.',
-    reference: 'אסמכתא',
-    issued: kind === 'invoice' ? 'הופק' : 'תאריך',
-    due: kind === 'invoice' ? 'לתשלום עד' : 'בתוקף עד',
-    taxId: (id: string) => `ח.פ. ${id}`,
+    title: kind === 'invoice' ? 'Invoice' : 'Proposal',
+    billTo: kind === 'invoice' ? 'Bill to' : 'Prepared for',
+    description: 'Description',
+    qty: 'Qty',
+    unit: 'Unit',
+    tax: 'Tax',
+    amount: 'Amount',
+    subtotal: 'Subtotal',
+    discount: (n: string) => `Discount (${n}%)`,
+    taxLine: (n: string) => `Tax ${n}%`,
+    total: kind === 'invoice' ? 'Total due' : 'Total',
+    notes: kind === 'invoice' ? 'Payment terms' : 'Notes & terms',
+    empty: 'No line items yet.',
+    reference: 'Reference',
+    issued: kind === 'invoice' ? 'Issued' : 'Date',
+    due: kind === 'invoice' ? 'Due' : 'Valid until',
+    taxId: (id: string) => `Tax ID ${id}`,
   };
 }
 
@@ -197,10 +152,8 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
   const branded = isPro || preview;
   const tpl = resolveTemplate(doc, branded);
   const showLogo = Boolean(doc.logo) && branded;
-  const rtl = documentIsRtl(doc);
   const unicode = documentNeedsUnicode(doc);
-  const dir = rtl ? 'rtl' : 'ltr';
-  const L = labels(rtl, doc.kind);
+  const L = labels(doc.kind);
   const pages: LaidOutPage[] = [];
   let ops: Op[] = [];
   let y: number = MARGIN.top;
@@ -235,7 +188,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       t: 'text',
       x,
       y: yy,
-      text: visualOrder(t, dir),
+      text: visualOrder(t, paragraphDirFor(t)),
       size,
       weight: opts.weight ?? 'normal',
       color: opts.color ?? tpl.ink,
@@ -310,7 +263,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
   }
 
   // Title + metadata, top-right.
-  const titleText = rtl ? L.title : tpl.titleUpper ? L.title.toUpperCase() : L.title;
+  const titleText = tpl.titleUpper ? L.title.toUpperCase() : L.title;
   text(titleText, PAGE.w - MARGIN.right, identityTop + 7, tpl.titleSize, {
     weight: tpl.titleWeight,
     color: tpl.accent,
@@ -635,10 +588,6 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       });
     }
   });
-
-  if (rtl) {
-    for (const page of pages) page.ops = mirrorOps(page.ops);
-  }
 
   return { pages };
 }

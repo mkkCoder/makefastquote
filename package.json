@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "npm run metrics && tsc -b && vite build && node scripts/bundle-budget.mjs",
     "preview": "vite preview --port 4173",
-    "metrics": "node scripts/gen-metrics.mjs",
+    "metrics": "node scripts/gen-metrics.mjs && node scripts/gen-unicode-metrics.mjs",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",

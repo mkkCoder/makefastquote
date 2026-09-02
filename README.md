@@ -85,9 +85,22 @@ file contains **no basic Latin at all** — subsetting from it yields a font wit
 no letters and headings that print blank. Merge the ranges and assert common
 characters survive.
 
-The cost of standard fonts: the character set is WinAnsi (Latin-1). Hebrew,
-Arabic and CJK will not render. That is a known limitation, stated on the
-landing page's FAQ.
+**We embed Noto Sans Hebrew when a document contains Hebrew.** Latin-only
+PDFs still use the built-in Helvetica faces (no font file). Hebrew cannot be
+encoded in WinAnsi — that is why it used to export as `ÔÛÜ` garbage. The TTF
+is fetched only on export, same as jsPDF. Preview measurement uses
+`unicode-metrics.ts` generated from jsPDF after `addFont`, so wrap agrees.
+
+After embedding, jsPDF writes `/Ordering (Identity-H)` on the CID font.
+Patch that to `/Ordering (Identity)` at the same byte length (`patchCidOrdering`)
+or readers drop ToUnicode and copy-paste is Latin mojibake again.
+
+**Do not subset from a Fontsource `latin-ext` file** for a different script —
+those packs often contain no basic Latin. Noto Sans Hebrew's full TTF includes
+both. Merge ranges and assert common characters survive.
+
+The cost of standard fonts for everything else: Arabic and CJK still will not
+render. That is stated on the landing page FAQ.
 
 **`html2canvas`, `dompurify` and `canvg` are aliased to a throwing stub** in
 `vite.config.ts`. jsPDF imports them statically for its `.html()` path, which we

@@ -9,6 +9,15 @@ import {
   KERNING_DIVISOR,
   type FaceKey,
 } from './metrics';
+import {
+  UNICODE_FALLBACK_WIDTH,
+  UNICODE_WIDTH_DIVISOR,
+  UNICODE_WIDTHS,
+  type UnicodeFace,
+} from './unicode-metrics';
+import { needsUnicodeFont } from './unicodeFont';
+
+export { needsUnicodeFont } from './unicodeFont';
 
 /**
  * Text measurement shared by the on-screen preview and the PDF exporter.
@@ -32,7 +41,21 @@ const faceKey = (weight: FontWeight): FaceKey => `helvetica-${weight}` as FaceKe
  *
  * 1 pt = 25.4/72 mm; advances are in 1/WIDTH_DIVISOR em.
  */
+function measureUnicode(text: string, sizePt: number, weight: FontWeight): number {
+  const face: UnicodeFace = weight === 'bold' ? 'bold' : 'normal';
+  const table = UNICODE_WIDTHS[face];
+  const fallback = UNICODE_FALLBACK_WIDTH[face];
+  let units = 0;
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    units += (table[String(code)] ?? fallback) / UNICODE_WIDTH_DIVISOR;
+  }
+  return units * sizePt * (25.4 / 72);
+}
+
 export function measureText(text: string, sizePt: number, weight: FontWeight = 'normal'): number {
+  if (needsUnicodeFont(text)) return measureUnicode(text, sizePt, weight);
+
   const face = faceKey(weight);
   const table = WIDTHS[face];
   const extra = EXTRA_WIDTHS[face];

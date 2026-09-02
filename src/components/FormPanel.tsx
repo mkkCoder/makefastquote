@@ -63,6 +63,7 @@ function Field({
       {area ? (
         <textarea
           id={id}
+          dir="auto"
           className="field resize-y min-h-[4.5rem]"
           value={value}
           placeholder={placeholder}
@@ -72,6 +73,7 @@ function Field({
         <input
           id={id}
           type={type}
+          dir={type === 'date' ? undefined : 'auto'}
           className="field"
           value={value}
           placeholder={placeholder}
@@ -293,6 +295,7 @@ export function FormPanel() {
           </label>
           <textarea
             id="notes-terms"
+            dir="auto"
             className="field resize-y min-h-[6rem]"
             value={doc.notes}
             placeholder={

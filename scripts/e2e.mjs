@@ -743,6 +743,28 @@ await check('Download PDF produces a real PDF with selectable text', async () =>
   assertNoConsoleErrors(errors);
 });
 
+await check('Hebrew in the form is real Hebrew in the PDF, not WinAnsi garbage', async () => {
+  const errors = await withPage(async (page) => {
+    await page.goto(`${origin}/app/`, { waitUntil: 'load' });
+    await page.locator('#f-business-or-your-name').fill('שלום סטודיו');
+    await page.locator('[aria-label="Description for line 1"]').fill('עיצוב זהות');
+
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.locator('[data-testid="download-pdf"]').click(),
+    ]);
+    const bytes = await readFile(await download.path());
+    await writeFile(resolve(here, '../screenshots/hebrew.pdf'), bytes);
+    assert(bytes.subarray(0, 5).toString() === '%PDF-', 'not a PDF');
+    const body = bytes.toString('latin1');
+    assert(body.includes('NotoSansHebrew'), 'the Hebrew-capable font was not embedded');
+    assert(body.includes('/ToUnicode'), 'PDF has no ToUnicode map — copy-paste will be garbage');
+    assert(body.includes('/Ordering (Identity)'), 'CID Ordering was not patched; copy-paste will be mojibake');
+    assert(!body.includes('/Ordering (Identity-H)'), 'unpatched Identity-H Ordering left in the file');
+  });
+  assertNoConsoleErrors(errors);
+});
+
 // ── 12. responsive breakpoints ─────────────────────────────────────────────
 for (const [label, viewport] of [
   ['mobile 390x844', { width: 390, height: 844 }],

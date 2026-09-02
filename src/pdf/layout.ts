@@ -2,6 +2,7 @@ import type { DocumentState, Stroke } from '../types';
 import { computeTotals, formatMoney } from '../lib/money';
 import { TEMPLATES, type Template } from './templates';
 import { measureText, wrapText, truncateToWidth, fitFontSize, type FontWeight } from './text';
+import { visualOrder } from './unicodeFont';
 import { SITE } from '../config';
 import { clampScale } from '../lib/logo';
 import { isHexColor, mixHex } from '../lib/color';
@@ -141,7 +142,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       t: 'text',
       x,
       y: yy,
-      text: t,
+      text: visualOrder(t),
       size,
       weight: opts.weight ?? 'normal',
       color: opts.color ?? tpl.ink,

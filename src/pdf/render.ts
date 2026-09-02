@@ -1,5 +1,13 @@
 import type { DocumentState } from '../types';
 import { layoutDocument, PAGE, type Op } from './layout';
+import {
+  UNICODE_FONT,
+  addUnicodeFonts,
+  needsUnicodeFont,
+  patchCidOrdering,
+} from './unicodeFont';
+import regularUrl from './fonts/NotoSansHebrew-Regular.ttf?url';
+import boldUrl from './fonts/NotoSansHebrew-Bold.ttf?url';
 
 /**
  * Renders the shared layout model to a real PDF.
@@ -10,14 +18,9 @@ import { layoutDocument, PAGE, type Op } from './layout';
  * it up front would make the first paint slower for everyone to save one
  * click's latency for a few.
  *
- * We draw with the three standard PDF fonts (Helvetica normal/bold/oblique),
- * which every reader has built in. That means:
- *   - no font file to download, so the bundle stays small;
- *   - text is real, selectable, searchable text;
- *   - and we sidestep the whole class of embedded-font traps documented in
- *     the README (invalid CIDSystemInfo, unicode-range subsetting).
- * The cost is that the character set is WinAnsi (Latin-1). Non-Latin scripts
- * need an embedded font — see the README hand-off section before adding one.
+ * Latin-only documents still use the built-in Helvetica faces (no font file).
+ * Hebrew cannot be encoded in WinAnsi — those documents embed Noto Sans Hebrew
+ * on export, lazily, the same way jsPDF itself is lazy.
  */
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -41,12 +44,32 @@ const styleFor = (w: 'normal' | 'bold' | 'italic'): string =>
 
 type PdfDoc = import('jspdf').jsPDF;
 
+let fontCache: { regular: ArrayBuffer; bold: ArrayBuffer } | null = null;
+
+async function unicodeFontBytes(): Promise<{ regular: ArrayBuffer; bold: ArrayBuffer }> {
+  if (fontCache) return fontCache;
+  const [regular, bold] = await Promise.all([
+    fetch(regularUrl).then((r) => r.arrayBuffer()),
+    fetch(boldUrl).then((r) => r.arrayBuffer()),
+  ]);
+  fontCache = { regular, bold };
+  return fontCache;
+}
+
+function fontFor(op: Extract<Op, { t: 'text' }>): { family: string; style: string } {
+  if (!needsUnicodeFont(op.text)) {
+    return { family: 'helvetica', style: styleFor(op.weight) };
+  }
+  return { family: UNICODE_FONT, style: op.weight === 'bold' ? 'bold' : 'normal' };
+}
+
 function drawOp(pdf: PdfDoc, op: Op): void {
   switch (op.t) {
     case 'text': {
       const [r, g, b] = hexToRgb(op.color);
+      const { family, style } = fontFor(op);
       pdf.setTextColor(r, g, b);
-      pdf.setFont('helvetica', styleFor(op.weight));
+      pdf.setFont(family, style);
       pdf.setFontSize(op.size);
       if (op.tracking) pdf.setCharSpace(op.tracking);
       if (op.opacity !== undefined && op.opacity < 1) {
@@ -126,6 +149,14 @@ export async function buildPdf({ doc, isPro }: RenderOptions): Promise<Blob> {
     compress: true,
   });
 
+  const ops = pages.flatMap((p) => p.ops);
+  const unicodeOps = ops.filter((op): op is Extract<Op, { t: 'text' }> => op.t === 'text' && needsUnicodeFont(op.text));
+  if (unicodeOps.length) {
+    const { regular, bold } = await unicodeFontBytes();
+    const needBold = unicodeOps.some((op) => op.weight === 'bold');
+    addUnicodeFonts(pdf, regular, needBold ? bold : null);
+  }
+
   pdf.setProperties({
     title: `${doc.kind === 'invoice' ? 'Invoice' : 'Proposal'} ${doc.reference}`.trim(),
     subject: doc.client.name ? `For ${doc.client.name}` : '',
@@ -138,7 +169,11 @@ export async function buildPdf({ doc, isPro }: RenderOptions): Promise<Blob> {
     for (const op of page.ops) drawOp(pdf, op);
   });
 
-  return pdf.output('blob');
+  const raw = pdf.output('arraybuffer');
+  const patched = patchCidOrdering(new Uint8Array(raw));
+  const copy = new ArrayBuffer(patched.byteLength);
+  new Uint8Array(copy).set(patched);
+  return new Blob([copy], { type: 'application/pdf' });
 }
 
 export function suggestedFilename(doc: DocumentState): string {

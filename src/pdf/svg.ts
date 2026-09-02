@@ -30,7 +30,8 @@ function opToSvg(op: Op): string {
       const opacity = op.opacity !== undefined ? ` fill-opacity="${n(op.opacity)}"` : '';
       return (
         `<text x="${n(op.x)}" y="${n(op.y)}" font-size="${n(sizeMm)}" fill="${op.color}"` +
-        ` text-anchor="${anchor(op.align)}"${weight}${style}${tracking}${opacity}` +
+        ` text-anchor="${anchor(op.align)}" unicode-bidi="bidi-override" direction="ltr"` +
+        `${weight}${style}${tracking}${opacity}` +
         ` xml:space="preserve">${esc(op.text)}</text>`
       );
     }
@@ -63,7 +64,7 @@ export function pageToSvg(page: LaidOutPage): string {
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PAGE.w} ${PAGE.h}"` +
     ` width="100%" style="display:block;background:#fff"` +
-    ` font-family="Helvetica, Arial, 'Liberation Sans', sans-serif">` +
+    ` font-family="'Noto Sans Hebrew', Helvetica, Arial, 'Liberation Sans', sans-serif">` +
     `<rect x="0" y="0" width="${PAGE.w}" height="${PAGE.h}" fill="#ffffff" />` +
     page.ops.map(opToSvg).join('') +
     `</svg>`

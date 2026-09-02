@@ -62,6 +62,7 @@ export function LineItems() {
             >
               <input
                 className="field col-span-2 sm:col-span-1"
+                dir="auto"
                 data-field="description"
                 placeholder="What are you charging for?"
                 aria-label={`Description for line ${index + 1}`}

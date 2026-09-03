@@ -5,8 +5,9 @@
   "type": "module",
   "description": "Freelance proposal and invoice generator. 100% client-side.",
   "scripts": {
-    "dev": "vite",
-    "build": "npm run metrics && tsc -b && vite build && node scripts/bundle-budget.mjs",
+    "niches": "node scripts/gen-niches.mjs",
+    "dev": "npm run niches && vite",
+    "build": "npm run niches && npm run metrics && tsc -b && vite build && node scripts/bundle-budget.mjs",
     "preview": "vite preview --port 4173",
     "metrics": "node scripts/gen-metrics.mjs && node scripts/gen-unicode-metrics.mjs",
     "lint": "eslint .",

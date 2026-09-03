@@ -17,6 +17,8 @@ export default function App() {
   const tab = useApp((s) => s.workspaceTab);
   const setTab = useApp((s) => s.setWorkspaceTab);
 
+  const loadNiche = useApp((s) => s.loadNiche);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -25,6 +27,12 @@ export default function App() {
       if (url.searchParams.get('upgrade')) {
         openUpgrade('everything below');
         url.searchParams.delete('upgrade');
+        window.history.replaceState({}, '', url.toString());
+      }
+      const nicheSlug = url.searchParams.get('niche');
+      if (nicheSlug) {
+        loadNiche(nicheSlug);
+        url.searchParams.delete('niche');
         window.history.replaceState({}, '', url.toString());
       }
     } catch {

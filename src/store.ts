@@ -16,6 +16,7 @@ import { TEMPLATES } from './pdf/templates';
 import { loadArchive, upsertArchive, removeArchive, type ArchiveEntry } from './lib/archive';
 import { loadProfile, saveProfile, profileFromDoc } from './lib/profile';
 import { clampScale } from './lib/logo';
+import { applyNicheToDocument, getNiche } from './lib/niches';
 
 interface AppState {
   doc: DocumentState;
@@ -32,6 +33,8 @@ interface AppState {
 
   setKind: (kind: DocKind) => void;
   setTemplate: (id: TemplateId) => void;
+  /** Load a programmatic-SEO niche starter into the editor (`?niche=`). */
+  loadNiche: (slug: string) => boolean;
   patchDoc: (patch: Partial<DocumentState>) => void;
   patchParty: (which: 'issuer' | 'client', patch: Partial<Party>) => void;
   addItem: () => void;
@@ -107,6 +110,21 @@ export const useApp = create<AppState>((set, get) => {
       const next = { ...get().doc, template: id };
       set({ doc: next });
       scheduleSave(next);
+    },
+
+    loadNiche: (slug) => {
+      const niche = getNiche(slug);
+      if (!niche) return false;
+      const next = applyNicheToDocument(get().doc, niche);
+      set({
+        doc: next,
+        saveNotice: `Loaded ${niche.industry.toLowerCase()} starter — edit and download.`,
+      });
+      flushSave(next);
+      setTimeout(() => {
+        if (get().saveNotice) set({ saveNotice: null });
+      }, 3200);
+      return true;
     },
 
     patchDoc: (patch) => {

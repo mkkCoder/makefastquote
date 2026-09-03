@@ -11,3 +11,5 @@ coverage
 test-results
 playwright-report
 /screenshots
+# Written by scripts/gen-niches.mjs so renamed slugs can be cleaned up.
+.niche-pages.json

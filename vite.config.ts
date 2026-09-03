@@ -4,6 +4,7 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -23,6 +24,19 @@ const root = dirname(fileURLToPath(import.meta.url));
 // reason; Vite does not rewrite those. Canonical/OG URLs stay absolute on
 // purpose — they must point at the production domain wherever they are served.
 const base = process.env.VITE_BASE ?? './';
+
+/** Niche MPA entries from `npm run niches` (src/data/niches.json → /{slug}/). */
+function nicheInputs(): Record<string, string> {
+  const nichesFile = resolve(root, 'src/data/niches.json');
+  if (!existsSync(nichesFile)) return {};
+  const niches = JSON.parse(readFileSync(nichesFile, 'utf8')) as Array<{ slug: string }>;
+  const inputs: Record<string, string> = {};
+  for (const n of niches) {
+    const html = resolve(root, n.slug, 'index.html');
+    if (existsSync(html)) inputs[n.slug] = html;
+  }
+  return inputs;
+}
 
 export default defineConfig({
   base,
@@ -45,6 +59,7 @@ export default defineConfig({
       input: {
         main: resolve(root, 'index.html'),
         app: resolve(root, 'app/index.html'),
+        ...nicheInputs(),
       },
     },
   },

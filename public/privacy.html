@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Privacy Policy | MakeFastQuote</title>
+    <meta
+      name="description"
+      content="How MakeFastQuote handles data: documents stay in your browser; checkout and licence checks go through Lemon Squeezy."
+    />
+    <link rel="canonical" href="https://makefastquote.com/privacy.html" />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #0f172a;
+        --muted: #334155;
+        --faint: #475569;
+        --surface: #f1f5f9;
+        --panel: #ffffff;
+        --edge: #e2e8f0;
+        --brand: #4f46e5;
+        --brand-ink: #ffffff;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --ink: #f8fafc;
+          --muted: #cbd5e1;
+          --faint: #94a3b8;
+          --surface: #0f172a;
+          --panel: #1e293b;
+          --edge: #334155;
+          --brand: #a5b4fc;
+          --brand-ink: #0f172a;
+        }
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font: 16px/1.6 ui-sans-serif, system-ui, sans-serif;
+        background: var(--surface);
+        color: var(--ink);
+      }
+      a {
+        color: var(--brand);
+      }
+      header {
+        border-bottom: 1px solid var(--edge);
+        background: var(--panel);
+      }
+      .wrap {
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 1rem 1.25rem;
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 0.85rem 1.25rem;
+      }
+      .mark {
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 0.5rem;
+        background: var(--brand);
+        color: var(--brand-ink);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+      }
+      .brand {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .btn {
+        margin-left: auto;
+        display: inline-flex;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 0.45rem 0.85rem;
+        border-radius: 0.5rem;
+        background: var(--brand);
+        color: var(--brand-ink);
+      }
+      h1 {
+        font-size: 1.75rem;
+        letter-spacing: -0.03em;
+        line-height: 1.2;
+        margin: 1.75rem 0 0.35rem;
+      }
+      .meta {
+        color: var(--faint);
+        font-size: 0.875rem;
+        margin: 0 0 1.75rem;
+      }
+      h2 {
+        font-size: 1.1rem;
+        margin: 1.75rem 0 0.5rem;
+      }
+      p,
+      li {
+        color: var(--muted);
+        margin: 0 0 0.75rem;
+      }
+      ul {
+        padding-left: 1.2rem;
+        margin: 0 0 0.75rem;
+      }
+      footer {
+        border-top: 1px solid var(--edge);
+        margin-top: 3rem;
+        padding: 1.5rem 0 2.5rem;
+        color: var(--faint);
+        font-size: 0.875rem;
+      }
+      footer a {
+        color: var(--faint);
+        margin-right: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="bar">
+        <span class="mark" aria-hidden="true">Q</span>
+        <a class="brand" href="./">makefastquote.com</a>
+        <a class="btn" href="./app/">Open editor</a>
+      </div>
+    </header>
+    <main class="wrap">
+      <h1>Privacy Policy</h1>
+      <p class="meta">Last updated: 3 September 2026</p>
+
+      <h2>Who we are</h2>
+      <p>
+        MakeFastQuote is a browser-based invoice and proposal generator at
+        <a href="https://makefastquote.com/">makefastquote.com</a>. Billing contact is via Lemon
+        Squeezy only — see <a href="./contact.html">Contact</a>. We do not publish an operator
+        email.
+      </p>
+
+      <h2>What we collect</h2>
+      <ul>
+        <li>
+          <strong>In the app:</strong> Content you type (company details, line items, notes,
+          logos, signatures) stays in your browser storage on this device
+          (<code>localStorage</code>). We do not operate an app server that receives your
+          documents.
+        </li>
+        <li>
+          <strong>When you buy Pro:</strong> Payment and licence fulfilment are handled by
+          <a href="https://www.lemonsqueezy.com/" rel="noopener noreferrer">Lemon Squeezy</a>
+          (merchant of record). Their
+          <a href="https://www.lemonsqueezy.com/privacy" rel="noopener noreferrer"
+            >privacy policy</a
+          >
+          applies to checkout. Licence keys may be validated in the browser via Lemon Squeezy’s
+          License API.
+        </li>
+        <li><strong>Analytics:</strong> None. We do not use analytics cookies or trackers.</li>
+      </ul>
+
+      <h2>What we do not do</h2>
+      <p>
+        We do not require an account, sell your document content, or run a database of your
+        invoices or proposals. Exports (PDF, CSV, JSON) are created on your device.
+      </p>
+
+      <h2>Data retention &amp; deletion</h2>
+      <p>
+        Clearing this site’s data in your browser removes local content and may remove a locally
+        stored Pro unlock. Keep your licence key from the purchase email so you can restore Pro
+        on this or another device.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        See <a href="./contact.html">Contact</a> for Lemon Squeezy billing and refunds. There is
+        no operator email or product-support inbox.
+      </p>
+    </main>
+    <footer>
+      <div class="wrap">
+        <a href="./privacy.html">Privacy</a>
+        <a href="./terms.html">Terms</a>
+        <a href="./contact.html">Contact</a>
+        <a href="./">Home</a>
+      </div>
+    </footer>
+  </body>
+</html>

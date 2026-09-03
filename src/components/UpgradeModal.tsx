@@ -28,9 +28,19 @@ export function UpgradeModal() {
   // than making them hunt for it.
   const [codeFieldOpen, setCodeFieldOpen] = useState(false);
   const [buying, setBuying] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const codeInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (!reason) return;
+    setAcceptedTerms(false);
+    setCodeFieldOpen(false);
+    setStatus('idle');
+    setMessage('');
+    setKey('');
+  }, [reason]);
 
   useEffect(() => {
     if (!reason) return;
@@ -165,15 +175,47 @@ export function UpgradeModal() {
           ) : (
             <>
               {isCheckoutConfigured() ? (
-                <button
-                  type="button"
-                  className="btn btn-primary w-full py-2.5 text-sm"
-                  onClick={buy}
-                  disabled={buying}
-                  data-testid="buy-button"
-                >
-                  {buying ? 'Opening checkout…' : `Unlock Pro — ${PRICE.display} once`}
-                </button>
+                <>
+                  <label className="flex items-start gap-2.5 text-xs text-muted leading-snug mb-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 shrink-0"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      data-testid="accept-terms"
+                    />
+                    <span>
+                      I agree to the{' '}
+                      <a
+                        href="../terms.html"
+                        className="text-brand underline underline-offset-2"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Terms
+                      </a>{' '}
+                      and{' '}
+                      <a
+                        href="../privacy.html"
+                        className="text-brand underline underline-offset-2"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Privacy Policy
+                      </a>
+                      .
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    className="btn btn-primary w-full py-2.5 text-sm"
+                    onClick={buy}
+                    disabled={buying || !acceptedTerms}
+                    data-testid="buy-button"
+                  >
+                    {buying ? 'Opening checkout…' : `Unlock Pro — ${PRICE.display} once`}
+                  </button>
+                </>
               ) : (
                 <p className="text-xs text-muted border border-edge rounded-lg p-3">
                   Checkout is not connected yet. Set <code>CHECKOUT_URL</code> in{' '}
@@ -197,7 +239,8 @@ export function UpgradeModal() {
               )}
 
               <p className="text-[11px] text-faint text-center mt-2">
-                One payment. No subscription, no account, no email required.
+                {PRICE.display} once via Lemon Squeezy. No subscription. Keep your licence key —
+                clearing site data may remove the local unlock.
               </p>
 
               <div className="mt-4 pt-4 border-t border-edge">

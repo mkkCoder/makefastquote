@@ -70,6 +70,23 @@ export function Header() {
           <span className="font-bold text-sm hidden sm:block">{SITE.domain}</span>
         </a>
 
+        <nav
+          className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-faint"
+          aria-label="Legal"
+        >
+          <a href="../privacy.html" className="hover:text-ink underline-offset-2 hover:underline">
+            Privacy
+          </a>
+          <span aria-hidden>·</span>
+          <a href="../terms.html" className="hover:text-ink underline-offset-2 hover:underline">
+            Terms
+          </a>
+          <span aria-hidden>·</span>
+          <a href="../contact.html" className="hover:text-ink underline-offset-2 hover:underline">
+            Contact
+          </a>
+        </nav>
+
           {saveNotice && (
           <span className="text-xs font-semibold text-accent hidden md:block" role="status">
             {saveNotice}

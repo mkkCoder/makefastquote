@@ -170,7 +170,7 @@ await check('landing page renders and links to the editor', async () => {
     await page.goto(`${origin}/`, { waitUntil: 'load' });
     assert(await page.locator('h1').isVisible(), 'no visible h1');
     const title = await page.title();
-    assert(/proposal/i.test(title), `title does not mention proposals: ${title}`);
+    assert(/quote/i.test(title), `title does not mention quotes: ${title}`);
     assert(/invoice/i.test(title), `title does not mention invoices: ${title}`);
     assert(title.length <= 60, `title is ${title.length} characters (want ≤60): ${title}`);
     const desc = await page.locator('meta[name="description"]').getAttribute('content');
@@ -192,13 +192,35 @@ await check('landing page renders and links to the editor', async () => {
     assert(heroDoc === 1, `expected 1 hero document SVG, found ${heroDoc}`);
     const h1Count = await page.locator('h1').count();
     assert(h1Count === 1, `expected exactly 1 h1, found ${h1Count}`);
+    const h1Text = (await page.locator('h1').textContent()) || '';
+    assert(/invoice/i.test(h1Text) && /quote/i.test(h1Text), `h1 missing core query terms: ${h1Text}`);
     // Structured data must be valid JSON or search engines silently drop it.
     const ld = await page.locator('script[type="application/ld+json"]').textContent();
     const graph = JSON.parse(ld);
     const types = JSON.stringify(graph);
     assert(types.includes('SoftwareApplication'), 'JSON-LD missing SoftwareApplication');
     assert(types.includes('FAQPage'), 'JSON-LD missing FAQPage');
+    assert(types.includes('HowTo'), 'JSON-LD missing HowTo');
     await page.screenshot({ path: join(shots, '01-landing.png'), fullPage: true });
+  });
+  assertNoConsoleErrors(errors);
+});
+
+// ── 1b. crawl assets ───────────────────────────────────────────────────────
+await check('robots.txt and sitemap.xml are present and valid', async () => {
+  const errors = await withPage(async (page) => {
+    const robots = await (await page.goto(`${origin}/robots.txt`, { waitUntil: 'load' })).text();
+    assert(/User-agent:\s*\*/i.test(robots), 'robots.txt missing User-agent');
+    assert(/Allow:\s*\//i.test(robots), 'robots.txt does not allow /');
+    assert(/Sitemap:\s*https:\/\/makefastquote\.com\/sitemap\.xml/i.test(robots), 'robots.txt missing sitemap URL');
+    assert(/Disallow:\s*\/app\//i.test(robots), 'robots.txt should keep /app/ out of the index');
+
+    const sitemapRes = await page.goto(`${origin}/sitemap.xml`, { waitUntil: 'load' });
+    assert(sitemapRes.ok(), `sitemap.xml returned ${sitemapRes.status()}`);
+    const sitemap = await sitemapRes.text();
+    assert(sitemap.includes('https://makefastquote.com/'), 'sitemap missing homepage');
+    assert(sitemap.includes('https://makefastquote.com/privacy.html'), 'sitemap missing privacy');
+    assert(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/.test(sitemap), 'sitemap missing lastmod');
   });
   assertNoConsoleErrors(errors);
 });

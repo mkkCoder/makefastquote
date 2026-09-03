@@ -16,6 +16,12 @@ const BENEFITS = [
 
 export function UpgradeModal() {
   const reason = useApp((s) => s.upgradeReason);
+  // Mount only while open so checkbox / code-field state resets without an effect.
+  if (!reason) return null;
+  return <UpgradeModalDialog reason={reason} />;
+}
+
+function UpgradeModalDialog({ reason }: { reason: string }) {
   const close = useApp((s) => s.closeUpgrade);
   const setLicense = useApp((s) => s.setLicense);
   const doc = useApp((s) => s.doc);
@@ -34,16 +40,6 @@ export function UpgradeModal() {
   const codeInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (!reason) return;
-    setAcceptedTerms(false);
-    setCodeFieldOpen(false);
-    setStatus('idle');
-    setMessage('');
-    setKey('');
-  }, [reason]);
-
-  useEffect(() => {
-    if (!reason) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') close();
     };
@@ -55,13 +51,11 @@ export function UpgradeModal() {
       document.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = prev;
     };
-  }, [reason, close]);
+  }, [close]);
 
   useEffect(() => {
     if (codeFieldOpen) codeInputRef.current?.focus();
   }, [codeFieldOpen]);
-
-  if (!reason) return null;
 
   const activate = async (raw: string) => {
     const cleaned = cleanPastedKey(raw);

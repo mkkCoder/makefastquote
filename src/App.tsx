@@ -69,7 +69,7 @@ export default function App() {
   return (
     <div className="min-h-full flex flex-col">
       <Header />
-      <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 py-5 pb-24 lg:pb-5">
+      <main className="flex-1 max-w-[1600px] w-full mx-auto px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] py-5 pb-24 lg:pb-5">
         <h1 className="sr-only">Quote and proposal editor</h1>
         <StorageBanners />
 

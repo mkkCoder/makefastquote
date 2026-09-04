@@ -136,39 +136,54 @@
         }
       }
       *, *::before, *::after { box-sizing: border-box; }
+      html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+        overflow-x: hidden;
+      }
       body {
-        margin: 0; background: var(--surface); color: var(--ink);
+        margin: 0; min-height: 100dvh; overflow-x: hidden; background: var(--surface); color: var(--ink);
         font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
       }
-      .wrap { max-width: 76rem; margin: 0 auto; padding: 0 1.5rem; }
+      .wrap {
+        max-width: 76rem; margin: 0 auto;
+        padding: 0 clamp(1rem, 4vw, 2.5rem);
+        padding-left: max(clamp(1rem, 4vw, 2.5rem), env(safe-area-inset-left));
+        padding-right: max(clamp(1rem, 4vw, 2.5rem), env(safe-area-inset-right));
+      }
+      img, picture, video, canvas, svg { display: block; max-width: 100%; height: auto; }
       header {
         position: sticky; top: 0; z-index: 10;
         background: color-mix(in srgb, var(--surface) 88%, transparent);
         backdrop-filter: saturate(160%) blur(12px); border-bottom: 1px solid var(--edge);
+        padding-top: env(safe-area-inset-top);
       }
-      .bar { height: 4rem; display: flex; align-items: center; gap: 0.65rem; }
+      .bar { min-height: 4rem; display: flex; align-items: center; gap: 0.65rem; min-width: 0; }
       .mark {
         width: 1.85rem; height: 1.85rem; border-radius: 0.55rem; background: var(--brand);
-        color: var(--brand-ink); display: grid; place-items: center; font-weight: 700; font-size: 0.9rem;
+        color: var(--brand-ink); display: grid; place-items: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
       }
-      .brand { font-weight: 650; font-size: 0.95rem; }
+      .brand {
+        font-weight: 650; font-size: 0.95rem; min-width: 0; overflow: hidden;
+        text-overflow: ellipsis; white-space: nowrap;
+      }
       .btn {
         display: inline-flex; align-items: center; justify-content: center; border-radius: 0.6rem;
         font-size: 0.95rem; font-weight: 600; padding: 0.75rem 1.3rem; border: 1px solid transparent;
-        text-decoration: none; cursor: pointer; white-space: nowrap;
+        text-decoration: none; cursor: pointer; white-space: nowrap; min-height: 44px; min-width: 44px;
       }
       .btn-primary { background: var(--brand); color: var(--brand-ink); }
       .btn-primary:hover { background: color-mix(in srgb, var(--brand) 86%, black); }
       .btn-ghost { border-color: #64748b; color: var(--ink); }
       .btn-sm { padding: 0.5rem 0.95rem; font-size: 0.875rem; border-radius: 0.5rem; }
       .btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
-      .hero { padding: 3.5rem 0 3rem; }
+      .hero { padding: clamp(2rem, 5vw, 3.5rem) 0 3rem; }
       .hero-grid {
         display: grid; gap: 2rem; align-items: start;
       }
       @media (min-width: 960px) {
-        .hero-grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
+        .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; }
       }
       h1 {
         font-size: clamp(1.75rem, 3.5vw, 2.45rem); letter-spacing: -0.03em;
@@ -176,6 +191,7 @@
       }
       .lede { color: var(--muted); font-size: 1.05rem; margin: 0 0 1.25rem; max-width: 36rem; }
       .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+      .cta-row .btn { white-space: normal; text-align: center; }
       .eyebrow {
         font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
         color: var(--brand); margin: 0 0 0.4rem;
@@ -185,17 +201,17 @@
         border-radius: 0.75rem; background: var(--panel); overflow: hidden;
       }
       .item-list li {
-        display: flex; justify-content: space-between; gap: 1rem; padding: 0.7rem 1rem;
+        display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.35rem 1rem; padding: 0.7rem 1rem;
         border-top: 1px solid var(--edge); font-size: 0.92rem;
       }
       .item-list li:first-child { border-top: 0; }
-      .item-list span:last-child { color: var(--muted); white-space: nowrap; }
+      .item-list span:last-child { color: var(--muted); }
       .sandbox label {
         display: block; font-size: 0.75rem; font-weight: 650; margin-bottom: 0.3rem; color: var(--muted);
       }
       .sandbox input {
         width: 100%; padding: 0.55rem 0.7rem; border-radius: 0.5rem; border: 1px solid var(--edge);
-        background: var(--panel); color: var(--ink); font: inherit; margin-bottom: 0.75rem;
+        background: var(--panel); color: var(--ink); font: inherit; font-size: 16px; min-height: 44px; margin-bottom: 0.75rem;
       }
       .doc-frame {
         background: var(--panel); border-radius: 0.85rem; box-shadow: var(--shadow);
@@ -203,12 +219,12 @@
       }
       .doc-frame svg { display: block; width: 100%; height: auto; }
       .doc-caption { font-size: 0.85rem; color: var(--muted); margin: 0.65rem 0 0; }
-      section.wrap { padding-top: 2.5rem; padding-bottom: 2.5rem; }
-      h2 { font-size: 1.45rem; letter-spacing: -0.02em; margin: 0 0 0.75rem; }
+      section.wrap { padding-top: clamp(2rem, 5vw, 2.5rem); padding-bottom: clamp(2rem, 5vw, 2.5rem); }
+      h2 { font-size: clamp(1.25rem, 1.1rem + 1vw, 1.45rem); letter-spacing: -0.02em; margin: 0 0 0.75rem; }
       h3 { font-size: 1.05rem; margin: 0 0 0.35rem; }
       .points {
         display: grid; gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
       }
       .point {
         background: var(--panel); border: 1px solid var(--edge); border-radius: 0.75rem; padding: 1rem 1.1rem;
@@ -218,13 +234,13 @@
         background: var(--panel); border: 1px solid var(--edge); border-radius: 0.65rem;
         padding: 0.85rem 1rem; margin-bottom: 0.65rem;
       }
-      .faq-list summary { cursor: pointer; font-weight: 650; }
+      .faq-list summary { cursor: pointer; font-weight: 650; min-height: 44px; display: flex; align-items: center; }
       .faq-list p { margin: 0.55rem 0 0; color: var(--muted); }
       footer {
-        border-top: 1px solid var(--edge); padding: 2rem 0 2.5rem; color: var(--muted); font-size: 0.9rem;
+        border-top: 1px solid var(--edge); padding: 2rem 0 max(2.5rem, env(safe-area-inset-bottom)); color: var(--muted); font-size: 0.9rem;
       }
-      footer a { color: var(--brand); }
-      .foot-links { display: flex; flex-wrap: wrap; gap: 0.85rem 1.25rem; margin-top: 0.75rem; }
+      footer a { color: var(--brand); display: inline-flex; align-items: center; min-height: 44px; }
+      .foot-links { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; margin-top: 0.75rem; }
       .skip {
         position: absolute; left: -999px; top: 0;
       }
@@ -237,7 +253,7 @@
       <div class="wrap bar">
         <span class="mark" aria-hidden="true">Q</span>
         <a class="brand" href="../" style="color: inherit; text-decoration: none">makefastquote.com</a>
-        <a class="btn btn-primary btn-sm" href="../app/?niche=tutoring-invoice" style="margin-left: auto">Customize this in the editor</a>
+        <a class="btn btn-primary btn-sm" href="../app/?niche=tutoring-invoice" style="margin-left: auto; flex-shrink: 0">Open editor</a>
       </div>
     </header>
 

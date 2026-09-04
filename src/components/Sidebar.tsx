@@ -119,7 +119,7 @@ export function SidebarRest() {
           <button
             type="button"
             onClick={deactivate}
-            className="text-xs text-faint hover:text-ink underline underline-offset-2 mt-2"
+            className="inline-flex items-center min-h-11 text-xs text-faint hover:text-ink underline underline-offset-2 mt-2"
           >
             Deactivate on this device
           </button>
@@ -143,12 +143,33 @@ export function SidebarRest() {
         </div>
       )}
 
+      <nav className="lg:hidden flex flex-wrap gap-x-3 text-xs text-faint" aria-label="Legal">
+        <a
+          href="../privacy.html"
+          className="inline-flex items-center min-h-11 underline-offset-2 hover:underline hover:text-ink"
+        >
+          Privacy
+        </a>
+        <a
+          href="../terms.html"
+          className="inline-flex items-center min-h-11 underline-offset-2 hover:underline hover:text-ink"
+        >
+          Terms
+        </a>
+        <a
+          href="../contact.html"
+          className="inline-flex items-center min-h-11 underline-offset-2 hover:underline hover:text-ink"
+        >
+          Contact
+        </a>
+      </nav>
+
       <button
         type="button"
         onClick={() => {
           if (confirm('Start a new quote? This clears the current one.')) resetDoc();
         }}
-        className="text-xs text-faint hover:text-ink underline underline-offset-2 text-left"
+        className="inline-flex items-center min-h-11 text-xs text-faint hover:text-ink underline underline-offset-2 text-left"
       >
         Start a new quote
       </button>

@@ -138,7 +138,7 @@ function UpgradeModalDialog({ reason }: { reason: string }) {
           <button
             type="button"
             onClick={close}
-            className="p-1.5 -m-1 rounded-md text-faint hover:text-ink"
+            className="p-1.5 min-h-11 min-w-11 grid place-items-center -m-1 rounded-md text-faint hover:text-ink"
             aria-label="Close"
           >
             <IconX />
@@ -241,7 +241,7 @@ function UpgradeModalDialog({ reason }: { reason: string }) {
                 {!codeFieldOpen ? (
                   <button
                     type="button"
-                    className="text-xs text-muted hover:text-ink underline underline-offset-2"
+                    className="inline-flex items-center min-h-11 text-sm text-muted hover:text-ink underline underline-offset-2"
                     onClick={() => setCodeFieldOpen(true)}
                   >
                     Already bought it? Enter your code
@@ -260,7 +260,7 @@ function UpgradeModalDialog({ reason }: { reason: string }) {
                       <input
                         id="license-code"
                         ref={codeInputRef}
-                        className="field font-mono text-xs"
+                        className="field font-mono"
                         placeholder="Paste the whole line — we'll find the code"
                         value={key}
                         data-testid="license-input"

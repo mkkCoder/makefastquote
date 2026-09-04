@@ -107,7 +107,7 @@ export function LineItems() {
                 <div className="flex">
                   <button
                     type="button"
-                    className="p-1.5 rounded-md text-faint hover:text-ink disabled:opacity-30"
+                    className="min-h-11 min-w-11 grid place-items-center rounded-md text-faint hover:text-ink disabled:opacity-30"
                     onClick={() => moveItem(item.id, -1)}
                     disabled={index === 0}
                     aria-label={`Move line ${index + 1} up`}
@@ -116,7 +116,7 @@ export function LineItems() {
                   </button>
                   <button
                     type="button"
-                    className="p-1.5 rounded-md text-faint hover:text-ink disabled:opacity-30"
+                    className="min-h-11 min-w-11 grid place-items-center rounded-md text-faint hover:text-ink disabled:opacity-30"
                     onClick={() => moveItem(item.id, 1)}
                     disabled={index === doc.items.length - 1}
                     aria-label={`Move line ${index + 1} down`}
@@ -125,7 +125,7 @@ export function LineItems() {
                   </button>
                   <button
                     type="button"
-                    className="p-1.5 rounded-md text-faint hover:text-red-600"
+                    className="min-h-11 min-w-11 grid place-items-center rounded-md text-faint hover:text-red-600"
                     onClick={() => removeItem(item.id)}
                     aria-label={`Remove line ${index + 1}`}
                   >
@@ -156,7 +156,7 @@ export function LineItems() {
             Discount
             <input
               id="discount"
-              className="field w-16 py-1 text-right"
+              className="field w-16 py-1 text-right min-h-11"
               inputMode="decimal"
               value={doc.discount === 0 ? '' : String(doc.discount)}
               placeholder="0"

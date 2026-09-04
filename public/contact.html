@@ -42,9 +42,15 @@
       *::after {
         box-sizing: border-box;
       }
+      html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+        overflow-x: hidden;
+      }
       body {
         margin: 0;
-        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-x: hidden;
         font: 16px/1.6 ui-sans-serif, system-ui, sans-serif;
         background: var(--surface);
         color: var(--ink);
@@ -55,11 +61,12 @@
       header {
         border-bottom: 1px solid var(--edge);
         background: var(--panel);
+        padding-top: env(safe-area-inset-top);
       }
       .wrap {
         max-width: 42rem;
         margin: 0 auto;
-        padding: 1rem 1.25rem;
+        padding: 1rem max(1.25rem, env(safe-area-inset-right)) 1rem max(1.25rem, env(safe-area-inset-left));
       }
       .bar {
         display: flex;
@@ -67,7 +74,8 @@
         gap: 0.65rem;
         max-width: 42rem;
         margin: 0 auto;
-        padding: 0.85rem 1.25rem;
+        min-width: 0;
+        padding: 0.85rem max(1.25rem, env(safe-area-inset-right)) 0.85rem max(1.25rem, env(safe-area-inset-left));
       }
       .mark {
         width: 1.75rem;
@@ -85,14 +93,22 @@
         font-size: 0.9rem;
         color: var(--ink);
         text-decoration: none;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .btn {
         margin-left: auto;
         display: inline-flex;
+        align-items: center;
+        justify-content: center;
         text-decoration: none;
         font-weight: 600;
         font-size: 0.85rem;
         padding: 0.45rem 0.85rem;
+        min-height: 44px;
+        flex-shrink: 0;
         border-radius: 0.5rem;
         background: var(--brand);
         color: var(--brand-ink);
@@ -124,12 +140,15 @@
       footer {
         border-top: 1px solid var(--edge);
         margin-top: 3rem;
-        padding: 1.5rem 0 2.5rem;
+        padding: 1.5rem 0 max(2.5rem, env(safe-area-inset-bottom));
         color: var(--faint);
         font-size: 0.875rem;
       }
       footer a {
         color: var(--faint);
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
         margin-right: 0.85rem;
       }
     </style>

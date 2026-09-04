@@ -42,7 +42,7 @@ export function HistoryDrawer() {
       }}
     >
       <aside
-        className="h-full w-full max-w-md bg-panel border-l border-edge shadow-2xl flex flex-col"
+        className="h-full w-full max-w-md bg-panel border-l border-edge shadow-2xl flex flex-col pb-[env(safe-area-inset-bottom)]"
         role="dialog"
         aria-labelledby="history-title"
       >
@@ -53,7 +53,7 @@ export function HistoryDrawer() {
             </h2>
             <p className="text-xs text-muted mt-0.5">Stored only on this device. Nothing is uploaded.</p>
           </div>
-          <button type="button" className="p-1.5 rounded-md text-faint hover:text-ink" onClick={() => setOpen(false)} aria-label="Close">
+          <button type="button" className="p-1.5 min-h-11 min-w-11 grid place-items-center rounded-md text-faint hover:text-ink" onClick={() => setOpen(false)} aria-label="Close">
             <IconX />
           </button>
         </div>

@@ -252,7 +252,10 @@
         box-sizing: border-box;
       }
       html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
         scroll-behavior: smooth;
+        overflow-x: hidden;
       }
       @media (prefers-reduced-motion: reduce) {
         html {
@@ -261,6 +264,8 @@
       }
       body {
         margin: 0;
+        min-height: 100dvh;
+        overflow-x: hidden;
         background: var(--surface);
         color: var(--ink);
         font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica,
@@ -271,7 +276,19 @@
       .wrap {
         max-width: 76rem;
         margin: 0 auto;
-        padding: 0 1.5rem;
+        padding: 0 clamp(1rem, 4vw, 2.5rem);
+        padding-left: max(clamp(1rem, 4vw, 2.5rem), env(safe-area-inset-left));
+        padding-right: max(clamp(1rem, 4vw, 2.5rem), env(safe-area-inset-right));
+      }
+
+      img,
+      picture,
+      video,
+      canvas,
+      svg {
+        display: block;
+        max-width: 100%;
+        height: auto;
       }
 
       /* ── header ─────────────────────────────────────────────────────── */
@@ -282,12 +299,27 @@
         background: color-mix(in srgb, var(--surface) 88%, transparent);
         backdrop-filter: saturate(160%) blur(12px);
         border-bottom: 1px solid var(--edge);
+        padding-top: env(safe-area-inset-top);
       }
       .bar {
-        height: 4rem;
+        min-height: 4rem;
         display: flex;
         align-items: center;
         gap: 0.65rem;
+      }
+      .brand {
+        font-weight: 650;
+        font-size: 0.95rem;
+        letter-spacing: -0.01em;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      @media (max-width: 22.5rem) {
+        .brand {
+          display: none;
+        }
       }
       .mark {
         width: 1.85rem;
@@ -300,11 +332,6 @@
         font-weight: 700;
         font-size: 0.9rem;
       }
-      .brand {
-        font-weight: 650;
-        font-size: 0.95rem;
-        letter-spacing: -0.01em;
-      }
 
       /* ── buttons ────────────────────────────────────────────────────── */
       .btn {
@@ -315,6 +342,8 @@
         font-size: 0.95rem;
         font-weight: 600;
         padding: 0.75rem 1.3rem;
+        min-height: 44px;
+        min-width: 44px;
         border: 1px solid transparent;
         text-decoration: none;
         cursor: pointer;
@@ -342,6 +371,14 @@
         padding: 0.5rem 0.95rem;
         font-size: 0.875rem;
         border-radius: 0.5rem;
+      }
+      @media (max-width: 26rem) {
+        .cta-extra {
+          display: none;
+        }
+        header.is-past-hero .scroll-cta {
+          display: none;
+        }
       }
       .btn:focus-visible {
         outline: 2px solid var(--brand);
@@ -407,6 +444,10 @@
         flex-wrap: wrap;
         gap: 0.75rem;
       }
+      .cta-row .btn {
+        white-space: normal;
+        text-align: center;
+      }
       .under-cta {
         font-size: 0.875rem;
         color: var(--faint);
@@ -456,7 +497,7 @@
 
       /* ── sections ───────────────────────────────────────────────────── */
       section {
-        padding: 4.5rem 0;
+        padding: clamp(2rem, 5vw, 4.5rem) 0;
       }
       .eyebrow {
         font-size: 0.75rem;
@@ -477,7 +518,7 @@
       .points {
         display: grid;
         gap: 1.75rem 3rem;
-        grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
       }
       .point h3 {
         margin: 0 0 0.35rem;
@@ -505,7 +546,7 @@
         background: var(--panel);
         border: 1px solid var(--edge);
         border-radius: 1rem;
-        padding: 2.5rem;
+        padding: clamp(1.25rem, 4vw, 2.5rem);
       }
       .privacy h2 {
         margin-bottom: 1rem;
@@ -521,7 +562,7 @@
       .price {
         display: grid;
         gap: 1.25rem;
-        grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
         align-items: stretch;
       }
       .tier {
@@ -603,6 +644,7 @@
         justify-content: space-between;
         gap: 1rem;
         align-items: center;
+        min-height: 44px;
       }
       summary::-webkit-details-marker {
         display: none;
@@ -668,7 +710,7 @@
       .sandbox {
         display: grid;
         gap: 0.65rem;
-        grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
         margin: 0 0 1rem;
       }
       .sandbox label {
@@ -686,7 +728,8 @@
         border-radius: 0.5rem;
         padding: 0.45rem 0.6rem;
         font: inherit;
-        font-size: 0.875rem;
+        font-size: 16px;
+        min-height: 44px;
         background: var(--panel);
         color: var(--ink);
       }
@@ -702,6 +745,7 @@
         color: var(--ink);
         border-radius: 999px;
         padding: 0.4rem 0.9rem;
+        min-height: 44px;
         font: inherit;
         font-size: 0.85rem;
         font-weight: 600;
@@ -727,14 +771,24 @@
       }
       footer {
         border-top: 1px solid var(--edge);
-        padding: 2rem 0 3rem;
+        padding: 2rem 0 max(3rem, env(safe-area-inset-bottom));
         color: var(--faint);
         font-size: 0.875rem;
+      }
+      footer nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 1rem;
+        align-items: center;
       }
       footer a {
         color: var(--faint);
         text-decoration: underline;
         text-underline-offset: 2px;
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding-inline: 0.15rem;
       }
       footer a:hover {
         color: var(--ink);
@@ -750,7 +804,7 @@
       <div class="wrap bar">
         <span class="mark" aria-hidden="true">Q</span>
         <span class="brand">makefastquote.com</span>
-        <a class="btn btn-primary btn-sm" href="./app/" style="margin-left: auto">Open editor — Free</a>
+        <a class="btn btn-primary btn-sm" href="./app/" style="margin-left: auto">Open editor<span class="cta-extra"> — Free</span></a>
         <a class="btn btn-ghost btn-sm scroll-cta" href="./app/?upgrade=1">Unlock Pro</a>
       </div>
     </header>
@@ -1013,19 +1067,12 @@
         </p>
         <nav aria-label="Site">
           <a href="#how-it-works">How it works</a>
-          ·
           <a href="#features">Features</a>
-          ·
           <a href="#pricing">Pricing</a>
-          ·
           <a href="#faq">FAQ</a>
-          ·
           <a href="./app/">Open editor</a>
-          ·
           <a href="./privacy.html">Privacy</a>
-          ·
           <a href="./terms.html">Terms</a>
-          ·
           <a href="./contact.html">Contact</a>
         </nav>
       </div>

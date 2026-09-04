@@ -56,11 +56,15 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-panel/90 backdrop-blur border-b border-edge">
-      <div className="max-w-[1600px] mx-auto px-4 h-14 flex items-center gap-3">
+    <header className="sticky top-0 z-30 bg-panel/90 backdrop-blur border-b border-edge pt-[env(safe-area-inset-top)]">
+      <div className="max-w-[1600px] mx-auto px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] h-14 flex items-center gap-2 sm:gap-3">
         {/* Relative: the app lives at <base>/app/, so "../" is the landing
             page whether the site is served from an apex domain or a subpath. */}
-        <a href="../" className="flex items-center gap-2 shrink-0" aria-label={`${SITE.name} home`}>
+        <a
+          href="../"
+          className="flex items-center gap-2 shrink-0 min-h-11"
+          aria-label={`${SITE.name} home`}
+        >
           <span
             aria-hidden
             className="w-7 h-7 rounded-lg bg-brand text-brand-ink grid place-items-center font-bold text-sm"
@@ -71,18 +75,27 @@ export function Header() {
         </a>
 
         <nav
-          className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-faint"
+          className="hidden md:flex items-center gap-1.5 text-xs text-faint"
           aria-label="Legal"
         >
-          <a href="../privacy.html" className="hover:text-ink underline-offset-2 hover:underline">
+          <a
+            href="../privacy.html"
+            className="inline-flex items-center min-h-11 hover:text-ink underline-offset-2 hover:underline"
+          >
             Privacy
           </a>
           <span aria-hidden>·</span>
-          <a href="../terms.html" className="hover:text-ink underline-offset-2 hover:underline">
+          <a
+            href="../terms.html"
+            className="inline-flex items-center min-h-11 hover:text-ink underline-offset-2 hover:underline"
+          >
             Terms
           </a>
           <span aria-hidden>·</span>
-          <a href="../contact.html" className="hover:text-ink underline-offset-2 hover:underline">
+          <a
+            href="../contact.html"
+            className="inline-flex items-center min-h-11 hover:text-ink underline-offset-2 hover:underline"
+          >
             Contact
           </a>
         </nav>
@@ -93,7 +106,7 @@ export function Header() {
           </span>
         )}
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             className="btn btn-ghost hidden sm:inline-flex"
@@ -186,7 +199,7 @@ export function Header() {
 
           <button
             type="button"
-            className="btn btn-primary"
+            className="btn btn-primary hidden lg:inline-flex"
             onClick={downloadPdf}
             disabled={exporting}
             data-testid="download-pdf"

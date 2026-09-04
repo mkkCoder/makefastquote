@@ -25,7 +25,7 @@ function Section({
       open={open}
       onToggle={(e) => setOpen(e.currentTarget.open)}
     >
-      <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+      <summary className="cursor-pointer list-none px-4 py-3 min-h-11 flex items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
         <span>
           <h3 className="text-sm font-bold tracking-tight">{title}</h3>
           {hint && <p className="text-xs text-muted mt-0.5">{hint}</p>}
@@ -114,6 +114,7 @@ export function FormPanel() {
           />
           <Field
             label="Phone"
+            type="tel"
             value={doc.issuer.phone}
             onChange={(v) => patchParty('issuer', { phone: v })}
             placeholder="Optional"
@@ -216,6 +217,7 @@ export function FormPanel() {
           />
           <Field
             label="Phone"
+            type="tel"
             value={doc.client.phone}
             onChange={(v) => patchParty('client', { phone: v })}
             placeholder="Optional"

@@ -789,6 +789,7 @@ await check('Hebrew in the form is real Hebrew in the PDF, not WinAnsi garbage',
 
 // ── 12. responsive breakpoints ─────────────────────────────────────────────
 for (const [label, viewport] of [
+  ['phone 320x568', { width: 320, height: 568 }],
   ['mobile 390x844', { width: 390, height: 844 }],
   ['tablet 834x1112', { width: 834, height: 1112 }],
   ['desktop 1440x900', { width: 1440, height: 900 }],
@@ -823,6 +824,20 @@ for (const [label, viewport] of [
     assertNoConsoleErrors(errors);
   });
 }
+
+await check('landing has no horizontal overflow at 320px', async () => {
+  const errors = await withPage(
+    async (page) => {
+      await page.goto(`${origin}/`, { waitUntil: 'load' });
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      assert(overflow <= 1, `landing scrolls horizontally by ${overflow}px`);
+    },
+    { viewport: { width: 320, height: 568 } },
+  );
+  assertNoConsoleErrors(errors);
+});
 
 // ── 13. every template renders ─────────────────────────────────────────────
 await check('all four templates render for a Pro user', async () => {

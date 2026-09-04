@@ -19,16 +19,18 @@ const texts = (ops: Op[]): string[] =>
   ops.filter((o): o is Extract<Op, { t: 'text' }> => o.t === 'text').map((o) => o.text);
 
 describe('layoutDocument', () => {
-  it('draws a proposal titled PROPOSAL and an invoice titled INVOICE', () => {
-    expect(texts(allOps(layoutDocument({ doc: doc(), isPro: false }).pages))).toContain('PROPOSAL');
+  it('draws a proposal titled PROPOSAL and a quote titled QUOTE', () => {
+    expect(texts(allOps(layoutDocument({ doc: doc({ kind: 'proposal' }), isPro: false }).pages))).toContain(
+      'PROPOSAL',
+    );
     expect(
-      texts(allOps(layoutDocument({ doc: doc({ kind: 'invoice' }), isPro: false }).pages)),
-    ).toContain('INVOICE');
+      texts(allOps(layoutDocument({ doc: doc({ kind: 'quote' }), isPro: false }).pages)),
+    ).toContain('QUOTE');
   });
 
   it('puts the document title on the left and the issuer on the right', () => {
     const ops = allOps(layoutDocument({ doc: doc(), isPro: false }).pages);
-    const title = ops.find((o): o is Extract<Op, { t: 'text' }> => o.t === 'text' && o.text === 'PROPOSAL');
+    const title = ops.find((o): o is Extract<Op, { t: 'text' }> => o.t === 'text' && o.text === 'QUOTE');
     const issuer = ops.find(
       (o): o is Extract<Op, { t: 'text' }> => o.t === 'text' && o.text === 'Jane Doe Design',
     );
@@ -169,6 +171,52 @@ describe('the free-tier gate is inside the generating code', () => {
   });
 });
 
+describe('legal quotation disclaimer', () => {
+  const needle = 'does not constitute a legal tax invoice';
+
+  it('prints on every page for free and Pro documents', () => {
+    const items = Array.from({ length: 60 }, () => ({
+      ...newItem(),
+      qty: 1,
+      description: 'x'.repeat(60),
+      unitPrice: 10,
+    }));
+    for (const isPro of [false, true]) {
+      const { pages } = layoutDocument({
+        doc: doc({ items, showCredit: false }),
+        isPro,
+      });
+      expect(pages.length).toBeGreaterThan(1);
+      for (const page of pages) {
+        expect(texts(page.ops).join(' ')).toContain(needle);
+      }
+    }
+  });
+
+  it('keeps disclaimer lines inside the page and below the content band', () => {
+    const { pages } = layoutDocument({ doc: doc(), isPro: true });
+    const disc = allOps(pages).filter(
+      (o): o is Extract<Op, { t: 'text' }> =>
+        o.t === 'text' && (o.text.includes('commercial price estimate') || o.text.includes(needle)),
+    );
+    expect(disc.length).toBeGreaterThan(0);
+    for (const op of disc) {
+      expect(op.size).toBeLessThanOrEqual(7);
+      expect(op.y).toBeLessThanOrEqual(PAGE.h);
+      expect(op.y).toBeGreaterThan(PAGE.h - MARGIN.bottom - 16);
+      const w = measureText(op.text, op.size, op.weight);
+      expect(op.x + w).toBeLessThanOrEqual(PAGE.w - MARGIN.right + 0.5);
+    }
+  });
+
+  it('shows revision suffix on the printed reference', () => {
+    const t = texts(
+      allOps(layoutDocument({ doc: doc({ reference: '101', revision: 2 }), isPro: true }).pages),
+    );
+    expect(t).toContain('101-v2');
+  });
+});
+
 describe('signature', () => {
   it('maps normalised strokes into the signature box on the page', () => {
     const { pages } = layoutDocument({
@@ -269,7 +317,7 @@ describe('templates', () => {
     for (const template of ['standard', 'modern', 'minimalist', 'classic'] as const) {
       const { pages } = layoutDocument({ doc: doc({ template }), isPro: true });
       const t = texts(allOps(pages));
-      expect(t).toContain('PROPOSAL');
+      expect(t).toContain('QUOTE');
       expect(t).toContain('Acme Ltd');
       expect(t.some((s) => s.includes('1,000.00'))).toBe(true);
     }

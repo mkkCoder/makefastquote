@@ -17,6 +17,7 @@ import { loadArchive, upsertArchive, removeArchive, type ArchiveEntry } from './
 import { loadProfile, saveProfile, profileFromDoc } from './lib/profile';
 import { clampScale } from './lib/logo';
 import { applyNicheToDocument, getNiche } from './lib/niches';
+import { NOTES_TEMPLATE, displayReference } from './lib/quote';
 
 interface AppState {
   doc: DocumentState;
@@ -54,6 +55,7 @@ interface AppState {
   deactivate: () => void;
 
   saveDraft: () => void;
+  saveRevision: () => void;
   resetDoc: () => void;
   rememberProfile: () => void;
   setWorkspaceTab: (tab: 'form' | 'preview') => void;
@@ -96,7 +98,10 @@ export const useApp = create<AppState>((set, get) => {
     profileSavedAt: loadProfile() ? 1 : null,
 
     setKind: (kind) => {
-      const next = { ...get().doc, kind };
+      const cur = get().doc;
+      const notes =
+        !cur.notes.trim() || cur.notes.trim() === NOTES_TEMPLATE ? NOTES_TEMPLATE : cur.notes;
+      const next = { ...cur, kind, notes };
       set({ doc: next });
       scheduleSave(next);
     },
@@ -253,10 +258,31 @@ export const useApp = create<AppState>((set, get) => {
       }, 2600);
     },
 
+    saveRevision: () => {
+      const cur = get().doc;
+      flushSave(cur);
+      upsertArchive(cur);
+      const next = {
+        ...cur,
+        id: crypto.randomUUID(),
+        revision: Math.max(1, cur.revision || 1) + 1,
+        status: 'draft' as const,
+      };
+      flushSave(next);
+      set({
+        doc: next,
+        archive: upsertArchive(next),
+        saveNotice: `Revision ${next.revision} (${displayReference(next)}). Fully editable.`,
+      });
+      setTimeout(() => {
+        if (get().saveNotice) set({ saveNotice: null });
+      }, 3200);
+    },
+
     resetDoc: () => {
       clearDocument();
       const fresh = defaultDocument();
-      set({ doc: fresh, saveNotice: 'Started a new document.' });
+      set({ doc: fresh, saveNotice: 'Started a new quote.' });
       saveDocument(fresh);
       setTimeout(() => {
         if (get().saveNotice) set({ saveNotice: null });

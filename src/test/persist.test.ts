@@ -16,7 +16,7 @@ describe('migrateDocument', () => {
 
   it('produces a valid document from complete garbage', () => {
     const { doc } = migrateDocument({ items: 'not an array', issuer: 42, kind: 'nonsense' });
-    expect(doc.kind).toBe('proposal');
+    expect(doc.kind).toBe('quote');
     expect(Array.isArray(doc.items)).toBe(true);
     expect(doc.issuer.name).toBe('');
   });
@@ -77,6 +77,22 @@ describe('migrateDocument', () => {
 
   it('drops a brand colour that is not a hex value', () => {
     expect(migrateDocument({ brandColor: 'red' }).doc.brandColor).toBeNull();
+  });
+
+  it('migrates legacy invoice kind and paid status onto the quote workflow', () => {
+    const { doc } = migrateDocument({
+      kind: 'invoice',
+      status: 'paid',
+      reference: '101',
+    });
+    expect(doc.kind).toBe('quote');
+    expect(doc.status).toBe('accepted');
+    expect(doc.revision).toBe(1);
+  });
+
+  it('maps unpaid and overdue onto sent and expired', () => {
+    expect(migrateDocument({ status: 'unpaid' }).doc.status).toBe('sent');
+    expect(migrateDocument({ status: 'overdue' }).doc.status).toBe('expired');
   });
 
   it('rejects an unknown template rather than rendering nothing', () => {

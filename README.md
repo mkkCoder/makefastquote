@@ -1,10 +1,10 @@
 # makefastquote.com
 
-A freelance proposal and invoice generator that runs entirely in the browser.
+A freelance quote, estimate, and proposal generator that runs entirely in the browser.
 No backend, no database, no accounts. The only outbound calls it ever makes are
 a licence check when someone activates Pro, and nothing else.
 
-Free: unlimited proposals and invoices, A4 PDF export with real searchable text,
+Free: unlimited quotes, estimates, and proposals, A4 PDF export with real searchable text,
 signatures, per-line tax, discounts, multi-page, and CSV/JSON export of your own
 data. A single credit line in the document footer.
 

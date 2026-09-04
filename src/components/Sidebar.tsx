@@ -1,7 +1,9 @@
 import { useApp } from '../store';
 import { TEMPLATES, TEMPLATE_ORDER } from '../pdf/templates';
 import { PRICE } from '../config';
+import { DOC_KINDS, KIND_LABEL } from '../lib/quote';
 import { IconCheck, IconFile, IconLock, IconReceipt, IconSparkle } from './Icons';
+import type { DocKind } from '../types';
 
 /**
  * The sidebar is deliberately split in two.
@@ -16,6 +18,13 @@ import { IconCheck, IconFile, IconLock, IconReceipt, IconSparkle } from './Icons
  *
  * On desktop both halves sit in the left column and the order is unchanged.
  */
+const KIND_ICON: Record<DocKind, typeof IconFile> = {
+  quote: IconReceipt,
+  estimate: IconReceipt,
+  proposal: IconFile,
+  proforma: IconFile,
+};
+
 export function SidebarTop() {
   const doc = useApp((s) => s.doc);
   const setKind = useApp((s) => s.setKind);
@@ -24,28 +33,26 @@ export function SidebarTop() {
     <aside className="flex flex-col gap-4">
       <nav aria-label="Document type">
         <span className="label">Document</span>
-        <div className="flex lg:flex-col gap-1.5">
-          {(
-            [
-              ['proposal', 'Proposal', IconFile],
-              ['invoice', 'Invoice', IconReceipt],
-            ] as const
-          ).map(([kind, label, Icon]) => (
-            <button
-              key={kind}
-              type="button"
-              onClick={() => setKind(kind)}
-              aria-current={doc.kind === kind ? 'true' : undefined}
-              data-testid={`kind-${kind}`}
-              className={[
-                'btn justify-start flex-1 lg:flex-none',
-                doc.kind === kind ? 'btn-primary' : 'btn-ghost',
-              ].join(' ')}
-            >
-              <Icon className="w-4 h-4" />
-              {label}
-            </button>
-          ))}
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-1.5">
+          {DOC_KINDS.map((kind) => {
+            const Icon = KIND_ICON[kind];
+            return (
+              <button
+                key={kind}
+                type="button"
+                onClick={() => setKind(kind)}
+                aria-current={doc.kind === kind ? 'true' : undefined}
+                data-testid={`kind-${kind}`}
+                className={[
+                  'btn justify-start',
+                  doc.kind === kind ? 'btn-primary' : 'btn-ghost',
+                ].join(' ')}
+              >
+                <Icon className="w-4 h-4" />
+                {KIND_LABEL[kind]}
+              </button>
+            );
+          })}
         </div>
       </nav>
     </aside>
@@ -107,7 +114,7 @@ export function SidebarRest() {
             Pro is active
           </p>
           <p className="text-xs text-muted mt-1 leading-snug">
-            Your logo, all templates, no footer credit.
+            Your logo, all templates, no marketing credit. The quotation disclaimer always prints.
           </p>
           <button
             type="button"
@@ -139,11 +146,11 @@ export function SidebarRest() {
       <button
         type="button"
         onClick={() => {
-          if (confirm('Start a new document? This clears the current one.')) resetDoc();
+          if (confirm('Start a new quote? This clears the current one.')) resetDoc();
         }}
         className="text-xs text-faint hover:text-ink underline underline-offset-2 text-left"
       >
-        Start a new document
+        Start a new quote
       </button>
     </aside>
   );

@@ -3,8 +3,8 @@ import { cleanPastedKey, fitFontSize, measureText, truncateToWidth, wrapText } f
 
 describe('measureText', () => {
   it('scales linearly with point size', () => {
-    const a = measureText('Invoice', 10);
-    const b = measureText('Invoice', 20);
+    const a = measureText('Quote', 10);
+    const b = measureText('Quote', 20);
     expect(b / a).toBeCloseTo(2, 6);
   });
 
@@ -20,7 +20,7 @@ describe('measureText', () => {
 describe('wrapText', () => {
   it('never returns a line wider than the limit', () => {
     const text =
-      'Payment is due within thirty days of the invoice date. Late payments accrue interest at 2% per month.';
+      'This quote is valid for thirty days from the date on the document.';
     const width = 60;
     for (const line of wrapText(text, width, 9)) {
       expect(measureText(line, 9)).toBeLessThanOrEqual(width);

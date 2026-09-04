@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Freelance proposal and invoice generator. 100% client-side.",
+  "description": "Freelance quote, estimate, and proposal generator. 100% client-side.",
   "scripts": {
     "niches": "node scripts/gen-niches.mjs",
     "dev": "npm run niches && vite",

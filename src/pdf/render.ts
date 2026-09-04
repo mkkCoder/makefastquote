@@ -1,4 +1,5 @@
 import type { DocumentState } from '../types';
+import { kindLabel, displayReference } from '../lib/quote';
 import { layoutDocument, PAGE, type Op } from './layout';
 import {
   UNICODE_FONT,
@@ -162,7 +163,7 @@ export async function buildPdf({ doc, isPro }: RenderOptions): Promise<Blob> {
   }
 
   pdf.setProperties({
-    title: `${doc.kind === 'invoice' ? 'Invoice' : 'Proposal'} ${doc.reference}`.trim(),
+    title: `${kindLabel(doc.kind)} ${displayReference(doc)}`.trim(),
     subject: doc.client.name ? `For ${doc.client.name}` : '',
     author: doc.issuer.name || '',
     creator: 'makefastquote.com',
@@ -181,11 +182,11 @@ export async function buildPdf({ doc, isPro }: RenderOptions): Promise<Blob> {
 }
 
 export function suggestedFilename(doc: DocumentState): string {
-  const kind = doc.kind === 'invoice' ? 'Invoice' : 'Proposal';
+  const kind = kindLabel(doc.kind);
   const who = (doc.client.name || 'document')
     .replace(/[^a-zA-Z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 40);
-  const ref = doc.reference.replace(/[^a-zA-Z0-9-]+/g, '');
+  const ref = displayReference(doc).replace(/[^a-zA-Z0-9-]+/g, '');
   return [kind, who, ref].filter(Boolean).join('-') + '.pdf';
 }

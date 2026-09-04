@@ -11,6 +11,7 @@ import { DOC_SCHEMA_VERSION, STORAGE_KEYS } from '../config';
 import { clampScale } from './logo';
 import { isHexColor } from './color';
 import { applyProfile, loadProfile } from './profile';
+import { NOTES_TEMPLATE, coerceKind } from './quote';
 
 const emptyParty = (): Party => ({
   name: '',
@@ -42,17 +43,18 @@ export function defaultDocument(): DocumentState {
   const fresh: DocumentState = {
     version: DOC_SCHEMA_VERSION,
     id: crypto.randomUUID(),
-    kind: 'proposal',
+    kind: 'quote',
     template: 'standard',
     currency: 'USD',
     reference: `${new Date().getFullYear()}-001`,
+    revision: 1,
     issueDate: today(),
     dueDate: plusDays(30),
     status: 'draft',
     issuer: emptyParty(),
     client: emptyParty(),
     items: [newItem()],
-    notes: '',
+    notes: NOTES_TEMPLATE,
     discount: 0,
     logo: null,
     logoScale: 1,
@@ -101,6 +103,23 @@ function coerceSignatureImage(v: unknown): SignatureImage | null {
   return src && aspect ? { src, aspect } : null;
 }
 
+function coerceStatus(v: unknown): DocStatus {
+  if (v === 'paid') return 'accepted';
+  if (v === 'unpaid') return 'sent';
+  if (v === 'overdue') return 'expired';
+  if (
+    v === 'draft' ||
+    v === 'sent' ||
+    v === 'viewed' ||
+    v === 'accepted' ||
+    v === 'declined' ||
+    v === 'expired'
+  ) {
+    return v;
+  }
+  return 'draft';
+}
+
 function coerceStrokes(v: unknown): Stroke[] {
   if (!Array.isArray(v)) return [];
   const out: Stroke[] = [];
@@ -138,7 +157,7 @@ export function migrateDocument(raw: unknown): { doc: DocumentState; changed: bo
 
   const o = raw as Record<string, unknown>;
 
-  const kind = o.kind === 'invoice' ? 'invoice' : 'proposal';
+  const kind = coerceKind(o.kind);
   const template =
     o.template === 'modern' || o.template === 'minimalist' || o.template === 'classic'
       ? o.template
@@ -163,8 +182,7 @@ export function migrateDocument(raw: unknown): { doc: DocumentState; changed: bo
     o.logoAlign === 'center' || o.logoAlign === 'right' || o.logoAlign === 'left'
       ? o.logoAlign
       : 'left';
-  const status: DocStatus =
-    o.status === 'sent' || o.status === 'paid' || o.status === 'draft' ? o.status : 'draft';
+  const status = coerceStatus(o.status);
   const brandRaw = str(o.brandColor);
   const brandColor = isHexColor(brandRaw) ? brandRaw : null;
   const logoAspect =
@@ -179,6 +197,7 @@ export function migrateDocument(raw: unknown): { doc: DocumentState; changed: bo
     template,
     currency: str(o.currency, 'USD'),
     reference: str(o.reference, base.reference),
+    revision: Math.max(1, Math.floor(num(o.revision, 1))),
     issueDate: str(o.issueDate, base.issueDate),
     dueDate: str(o.dueDate, base.dueDate),
     status,

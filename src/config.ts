@@ -7,7 +7,7 @@ export const SITE = {
   domain: 'makefastquote.com',
   url: 'https://makefastquote.com',
   name: 'MakeFastQuote',
-  tagline: 'Free invoice and quote generator',
+  tagline: 'Free quote and estimate generator',
 } as const;
 
 /** Price in whole units of `currency`. Referenced by every piece of copy. */
@@ -80,5 +80,5 @@ export const STORAGE_KEYS = {
   archive: 'mfq.archive.v1',
 } as const;
 
-/** Bumped whenever the persisted document shape changes. See lib/persist.ts. */
-export const DOC_SCHEMA_VERSION = 2;
+/** v3: quote kinds, proposal statuses, revision field. See lib/persist.ts. */
+export const DOC_SCHEMA_VERSION = 3;

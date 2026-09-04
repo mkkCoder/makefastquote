@@ -43,7 +43,7 @@
       "url": "https://makefastquote.com/consulting-proposal/",
       "image": "https://makefastquote.com/og.png",
       "applicationCategory": "BusinessApplication",
-      "applicationSubCategory": "Consulting invoice and quote generator",
+      "applicationSubCategory": "Consulting quote and estimate generator",
       "operatingSystem": "Web browser",
       "isAccessibleForFree": true,
       "description": "Build a consulting proposal PDF with discovery, strategy, and retainer lines prefilled. Free, private, and editable in your browser.",
@@ -52,7 +52,8 @@
         "Searchable A4 PDF export",
         "Live preview in the browser",
         "No account required",
-        "Client-side only — documents never leave the browser"
+        "Client-side only — documents never leave the browser",
+        "Quotation disclaimer on every PDF"
       ],
       "offers": [
         {
@@ -79,10 +80,10 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "Can I turn this proposal into an invoice later?",
+          "name": "Is this proposal a tax invoice?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. Duplicate or edit the document and switch the type to invoice when work starts."
+            "text": "No. It is a commercial proposal. Issue official tax invoices separately after payment or project completion."
           }
         },
         {
@@ -98,7 +99,7 @@
           "name": "Is there a watermark on free proposals?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Free PDFs include a small credit line. Pro removes it and adds logo and brand colour."
+            "text": "Free PDFs include a small credit line. Pro removes it. Every PDF also prints a quotation disclaimer."
           }
         }
       ]
@@ -244,12 +245,12 @@
       <section class="hero">
         <div class="wrap hero-grid">
           <div>
-            <p class="eyebrow">Consulting · Free quote / proposal</p>
+            <p class="eyebrow">Consulting · Free proposal</p>
             <h1>Consulting Proposal Template</h1>
             <p class="lede">Build a consulting proposal PDF with discovery, strategy, and retainer lines prefilled. Free, private, and editable in your browser.</p>
             <div class="cta-row">
               <a class="btn btn-primary" href="../app/?niche=consulting-proposal">Customize this in the editor</a>
-              <a class="btn btn-ghost" href="../">All invoice tools</a>
+              <a class="btn btn-ghost" href="../">All quote tools</a>
             </div>
             <p class="eyebrow" style="margin-top: 1.25rem">Prefilled line items</p>
             <ul class="item-list">
@@ -275,7 +276,7 @@
             </form>
             <div class="doc-frame" aria-live="polite">
               <p style="margin: 1.5rem; color: #64748b; font-size: 0.9rem">
-                Live consulting quote / proposal preview loads here from the same layout engine as the PDF.
+                Live consulting proposal preview loads here from the same layout engine as the PDF.
               </p>
             </div>
             <p class="doc-caption">Interactive preview — same renderer as the downloaded file.</p>
@@ -304,12 +305,12 @@
 
       <section class="wrap" id="faq">
         <p class="eyebrow">FAQ</p>
-        <h2>Consulting invoice and quote questions.</h2>
+        <h2>Consulting quote and estimate questions.</h2>
         <div class="faq-list">
           
           <details>
-            <summary>Can I turn this proposal into an invoice later?</summary>
-            <p>Yes. Duplicate or edit the document and switch the type to invoice when work starts.</p>
+            <summary>Is this proposal a tax invoice?</summary>
+            <p>No. It is a commercial proposal. Issue official tax invoices separately after payment or project completion.</p>
           </details>
           <details>
             <summary>Can I show tax per line?</summary>
@@ -317,7 +318,7 @@
           </details>
           <details>
             <summary>Is there a watermark on free proposals?</summary>
-            <p>Free PDFs include a small credit line. Pro removes it and adds logo and brand colour.</p>
+            <p>Free PDFs include a small credit line. Pro removes it. Every PDF also prints a quotation disclaimer.</p>
           </details>
         </div>
         <div class="cta-row" style="margin-top: 1.5rem">
@@ -328,7 +329,7 @@
 
     <footer>
       <div class="wrap">
-        <p>MakeFastQuote — free invoice, quote, and proposal PDFs for consulting and other trades.</p>
+        <p>MakeFastQuote — free quote, estimate, and proposal PDFs for consulting and other trades. Documents are quotations, not tax invoices.</p>
         <div class="foot-links">
           <a href="../">Home</a>
           <a href="../privacy.html">Privacy</a>

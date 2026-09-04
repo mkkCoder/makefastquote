@@ -171,7 +171,7 @@ await check('landing page renders and links to the editor', async () => {
     assert(await page.locator('h1').isVisible(), 'no visible h1');
     const title = await page.title();
     assert(/quote/i.test(title), `title does not mention quotes: ${title}`);
-    assert(/invoice/i.test(title), `title does not mention invoices: ${title}`);
+    assert(/estimate/i.test(title), `title does not mention estimates: ${title}`);
     assert(title.length <= 60, `title is ${title.length} characters (want ≤60): ${title}`);
     const desc = await page.locator('meta[name="description"]').getAttribute('content');
     assert(desc && desc.length <= 155, `meta description is ${desc?.length ?? 0} characters`);
@@ -193,7 +193,7 @@ await check('landing page renders and links to the editor', async () => {
     const h1Count = await page.locator('h1').count();
     assert(h1Count === 1, `expected exactly 1 h1, found ${h1Count}`);
     const h1Text = (await page.locator('h1').textContent()) || '';
-    assert(/invoice/i.test(h1Text) && /quote/i.test(h1Text), `h1 missing core query terms: ${h1Text}`);
+    assert(/estimate/i.test(h1Text) && /quote/i.test(h1Text), `h1 missing core query terms: ${h1Text}`);
     // Structured data must be valid JSON or search engines silently drop it.
     const ld = await page.locator('script[type="application/ld+json"]').textContent();
     const graph = JSON.parse(ld);
@@ -322,7 +322,7 @@ await check('a 60-line document paginates and stays inside the page', async () =
           'mfq.document.v1',
           JSON.stringify({
             version: 1,
-            kind: 'invoice',
+            kind: 'quote',
             template: 'standard',
             currency: 'USD',
             reference: '2026-BIG',
@@ -362,7 +362,7 @@ await check('an old save file loads through migration and is repaired on disk', 
         { what: 'the migrated document to be written back' },
       );
 
-      assert(stored.version === 2, `version not stamped: ${stored.version}`);
+      assert(stored.version === 3, `version not stamped: ${stored.version}`);
       assert(typeof stored.items[0].id === 'string', 'legacy row did not get an id');
       assert(stored.items[0].description === 'Legacy row', 'legacy content lost in migration');
       assert(stored.logo === null, 'a non-image logo URL survived migration');
@@ -376,7 +376,7 @@ await check('an old save file loads through migration and is repaired on disk', 
         localStorage.setItem(
           'mfq.document.v1',
           JSON.stringify({
-            kind: 'invoice',
+            kind: 'quote',
             items: [{ qty: 3, description: 'Legacy row', unitPrice: 20 }],
             logo: 'javascript:alert(1)',
             signature: [[[-5, 0.5], [9, 9]]],

@@ -34,7 +34,7 @@ describe('niches data', () => {
     const niche = getNiche('plumbing-invoice');
     expect(niche).toBeDefined();
     const doc = applyNicheToDocument(defaultDocument(), niche!);
-    expect(doc.kind).toBe('invoice');
+    expect(doc.kind).toBe('quote');
     expect(doc.items.map((i) => i.description)).toEqual(
       nicheItems(niche!).map((i) => i.description),
     );

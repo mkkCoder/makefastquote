@@ -3,13 +3,24 @@ import { formatMoney } from '../lib/money';
 import { archiveToJson } from '../lib/archive';
 import { downloadBlob } from '../lib/exportData';
 import { IconX } from './Icons';
+import { kindLabel } from '../lib/quote';
 import type { DocStatus } from '../types';
 
 const STATUS: Array<[DocStatus, string]> = [
   ['draft', 'Draft'],
   ['sent', 'Sent'],
-  ['paid', 'Paid'],
+  ['viewed', 'Viewed'],
+  ['accepted', 'Accepted'],
+  ['declined', 'Declined'],
+  ['expired', 'Expired'],
 ];
+
+function statusTone(status: DocStatus): string {
+  if (status === 'accepted') return 'bg-emerald-100 text-emerald-800';
+  if (status === 'declined' || status === 'expired') return 'bg-rose-100 text-rose-800';
+  if (status === 'sent' || status === 'viewed') return 'bg-amber-100 text-amber-800';
+  return 'bg-slate-100 text-slate-700';
+}
 
 export function HistoryDrawer() {
   const open = useApp((s) => s.historyOpen);
@@ -38,7 +49,7 @@ export function HistoryDrawer() {
         <div className="flex items-start justify-between p-4 border-b border-edge">
           <div>
             <h2 id="history-title" className="text-sm font-bold">
-              Documents in this browser
+              Quotes in this browser
             </h2>
             <p className="text-xs text-muted mt-0.5">Stored only on this device. Nothing is uploaded.</p>
           </div>
@@ -49,15 +60,15 @@ export function HistoryDrawer() {
 
         <div className="px-4 py-3 border-b border-edge">
           <span className="label">This document</span>
-          <div className="flex gap-1.5">
+          <div className="grid grid-cols-3 gap-1.5">
             {STATUS.map(([id, label]) => (
               <button
                 key={id}
                 type="button"
-                className={['btn text-xs flex-1', status === id ? 'btn-primary' : 'btn-ghost'].join(' ')}
+                className={['btn text-xs', status === id ? 'btn-primary' : 'btn-ghost'].join(' ')}
                 onClick={() => patchDoc({ status: id })}
               >
-                {label}
+                {id === 'accepted' ? 'Accept quote' : label}
               </button>
             ))}
           </div>
@@ -85,23 +96,19 @@ export function HistoryDrawer() {
                     <span className="flex items-center justify-between gap-2">
                       <span className="text-sm font-semibold truncate">
                         {entry.client || 'No client'} · {entry.reference || 'No ref'}
+                        {entry.doc.revision > 1 ? `-v${entry.doc.revision}` : ''}
                       </span>
                       <span
                         className={[
                           'text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded',
-                          entry.status === 'paid'
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : entry.status === 'sent'
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-slate-100 text-slate-700',
+                          statusTone(entry.status),
                         ].join(' ')}
                       >
                         {entry.status}
                       </span>
                     </span>
                     <span className="block text-xs text-muted mt-1">
-                      {entry.kind === 'invoice' ? 'Invoice' : 'Proposal'} ·{' '}
-                      {formatMoney(entry.total, entry.currency)} ·{' '}
+                      {kindLabel(entry.kind)} · {formatMoney(entry.total, entry.currency)} ·{' '}
                       {new Date(entry.savedAt).toLocaleDateString()}
                     </span>
                   </button>
@@ -110,7 +117,7 @@ export function HistoryDrawer() {
                     className="text-xs text-faint hover:text-ink underline mt-2"
                     onClick={() => deleteFromArchive(entry.id)}
                   >
-                    Remove
+                    {entry.status === 'draft' ? 'Delete draft' : 'Remove'}
                   </button>
                 </div>
               </li>

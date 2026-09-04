@@ -16,11 +16,11 @@ describe('measurement agrees with jsPDF', () => {
   const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
 
   const samples = [
-    'Invoice',
+    'Quote',
     'Total due',
     'Wolfeschlegelsteinhausenbergerdorff Consulting International Limited',
     '$1,234,567.89',
-    'Payment is due within thirty days of the invoice date.',
+    'This quote is valid for thirty days from the date on the document.',
     'jaguar quiz WXYZ 0123456789 (){}[]@#%&*',
     'Café Zürich Ångström — naïve façade',
   ];

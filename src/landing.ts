@@ -21,7 +21,7 @@ function renderDoc(
   if (el) {
     el.classList.add('doc');
     el.setAttribute('role', 'img');
-    el.setAttribute('aria-label', 'Live invoice preview generated in the browser');
+    el.setAttribute('aria-label', 'Live quote preview generated in the browser');
   }
 }
 

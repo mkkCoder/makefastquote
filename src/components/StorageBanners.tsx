@@ -29,7 +29,7 @@ export function StorageBanners() {
           data-testid="backup-banner"
         >
           <p className="flex-1 text-muted">
-            You have {archive.length} invoices stored in this browser.{' '}
+            You have {archive.length} quotes stored in this browser.{' '}
             <button
               type="button"
               className="font-semibold text-brand underline underline-offset-2"

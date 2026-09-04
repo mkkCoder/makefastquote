@@ -46,7 +46,7 @@ export function nicheDemoPatch(niche: Niche): Partial<DocumentState> {
     kind: niche.kind,
     template: 'modern',
     items: nicheItems(niche),
-    notes: `Payment due within 30 days. Prepared for ${niche.industry.toLowerCase()} work.`,
+    notes: `Official tax invoices will be issued separately upon payment or project completion. Prepared for ${niche.industry.toLowerCase()} work.`,
     client: {
       name: 'Acme Client Co.',
       contact: 'Alex Morgan',
@@ -83,7 +83,7 @@ export function applyNicheToDocument(doc: DocumentState, niche: Niche): Document
     })),
     notes: doc.notes.trim()
       ? doc.notes
-      : `Payment due within 30 days. Prepared for ${niche.industry.toLowerCase()} work.`,
+      : `Official tax invoices will be issued separately upon payment or project completion. Prepared for ${niche.industry.toLowerCase()} work.`,
     issuer: {
       ...doc.issuer,
       name: issuerName,

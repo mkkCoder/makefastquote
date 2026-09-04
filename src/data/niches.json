@@ -1,10 +1,10 @@
 [
   {
-    "title": "Freelance Web Design Invoice Template",
+    "title": "Freelance Web Design Quote Template",
     "slug": "freelance-web-design-invoice",
     "industry": "Web design",
-    "kind": "invoice",
-    "description": "Create a free web design invoice PDF with common project line items already filled in. Edit rates, tax, and branding in the browser — no sign-up.",
+    "kind": "quote",
+    "description": "Create a free web design quote PDF with common project line items already filled in. Edit rates, tax, and branding in the browser — no sign-up.",
     "prefilledItems": [
       { "description": "Homepage design (desktop + mobile)", "qty": 1, "unitPrice": 1800, "taxRate": 0 },
       { "description": "Inner pages design (×5)", "qty": 5, "unitPrice": 320, "taxRate": 0 },
@@ -16,8 +16,8 @@
         "answer": "Yes. Open the editor from this page and every field is editable — descriptions, quantities, rates, tax, and notes."
       },
       {
-        "question": "Is this web design invoice template free?",
-        "answer": "Yes. Unlimited invoices and searchable PDF export are free. Pro unlocks logo, brand colour, and studio templates for a one-time fee."
+        "question": "Is this web design quote template free?",
+        "answer": "Yes. Unlimited quotes and searchable PDF export are free. Pro unlocks logo, brand colour, and studio templates for a one-time fee."
       },
       {
         "question": "Does my client data leave the browser?",
@@ -29,7 +29,7 @@
     "title": "Graphic Design Quote Template",
     "slug": "graphic-design-quote",
     "industry": "Graphic design",
-    "kind": "proposal",
+    "kind": "quote",
     "description": "Send a polished graphic design quote PDF in minutes. Preloaded branding and packaging items you can customize before download.",
     "prefilledItems": [
       { "description": "Logo suite — primary, secondary, mark", "qty": 1, "unitPrice": 1200, "taxRate": 0 },
@@ -39,7 +39,7 @@
     "faq": [
       {
         "question": "Is a quote the same as a proposal here?",
-        "answer": "This page starts a proposal document labelled for quoting. You can switch between quote/proposal and invoice in the editor anytime."
+        "answer": "You can switch between quote, price estimate, proposal, and proforma in the editor. None of these is a tax invoice."
       },
       {
         "question": "Can I add print or packaging fees?",
@@ -52,11 +52,11 @@
     ]
   },
   {
-    "title": "Photography Invoice Template",
+    "title": "Photography Quote Template",
     "slug": "photography-invoice",
     "industry": "Photography",
-    "kind": "invoice",
-    "description": "Free photography invoice generator with session, editing, and usage-license lines ready to customize and download as a searchable PDF.",
+    "kind": "quote",
+    "description": "Free photography quote generator with session, editing, and usage-license lines ready to customize and download as a searchable PDF.",
     "prefilledItems": [
       { "description": "Half-day on-location shoot", "qty": 1, "unitPrice": 950, "taxRate": 0 },
       { "description": "Photo editing & colour (per image)", "qty": 40, "unitPrice": 12, "taxRate": 0 },
@@ -64,7 +64,7 @@
     ],
     "faq": [
       {
-        "question": "Can I invoice for prints and albums separately?",
+        "question": "Can I quote prints and albums separately?",
         "answer": "Yes. Add print packages, albums, or travel as extra line items in the editor."
       },
       {
@@ -72,8 +72,8 @@
         "answer": "Yes. Change the descriptions and rates to match weddings, headshots, product, or events."
       },
       {
-        "question": "Can I include a signature on the invoice?",
-        "answer": "Yes. Draw or upload a signature in the editor before exporting the PDF."
+        "question": "Can I include a signature on the quote?",
+        "answer": "Yes. Draw or upload a signature in the editor before exporting the PDF. Use Accept quote when the client signs off."
       }
     ]
   },
@@ -90,8 +90,8 @@
     ],
     "faq": [
       {
-        "question": "Can I turn this proposal into an invoice later?",
-        "answer": "Yes. Duplicate or edit the document and switch the type to invoice when work starts."
+        "question": "Is this proposal a tax invoice?",
+        "answer": "No. It is a commercial proposal. Issue official tax invoices separately after payment or project completion."
       },
       {
         "question": "Can I show tax per line?",
@@ -99,7 +99,7 @@
       },
       {
         "question": "Is there a watermark on free proposals?",
-        "answer": "Free PDFs include a small credit line. Pro removes it and adds logo and brand colour."
+        "answer": "Free PDFs include a small credit line. Pro removes it. Every PDF also prints a quotation disclaimer."
       }
     ]
   },
@@ -107,7 +107,7 @@
     "title": "Construction Estimate Template",
     "slug": "construction-estimate",
     "industry": "Construction",
-    "kind": "proposal",
+    "kind": "estimate",
     "description": "Generate a construction estimate PDF with labour, materials, and contingency lines. Customize quantities and download instantly.",
     "prefilledItems": [
       { "description": "Site prep & demolition", "qty": 1, "unitPrice": 2800, "taxRate": 0 },
@@ -118,7 +118,7 @@
     "faq": [
       {
         "question": "Is an estimate legally binding?",
-        "answer": "That depends on your local rules and contract language. This tool creates the document; add your terms in the notes field."
+        "answer": "That depends on your local rules and contract language. This tool creates a price estimate, not a tax invoice; add your terms in the notes field."
       },
       {
         "question": "Can I list materials and labour separately?",
@@ -134,7 +134,7 @@
     "title": "Landscaping Quote Template",
     "slug": "landscaping-quote",
     "industry": "Landscaping",
-    "kind": "proposal",
+    "kind": "quote",
     "description": "Free landscaping quote PDF with design, planting, and maintenance lines ready to edit. No account required.",
     "prefilledItems": [
       { "description": "Garden design plan", "qty": 1, "unitPrice": 750, "taxRate": 0 },
@@ -149,7 +149,7 @@
       },
       {
         "question": "Can clients accept this as a proposal?",
-        "answer": "Export the PDF and send it however you already work — email, drive, or print. Add acceptance language in notes if needed."
+        "answer": "Export the PDF and send it however you already work — email, drive, or print. Mark the quote Accepted when they sign off."
       },
       {
         "question": "Does this work on a phone?",
@@ -158,11 +158,11 @@
     ]
   },
   {
-    "title": "Cleaning Service Invoice Template",
+    "title": "Cleaning Service Quote Template",
     "slug": "cleaning-service-invoice",
     "industry": "Cleaning",
-    "kind": "invoice",
-    "description": "Invoice cleaning clients fast with recurring visit and deep-clean lines prefilled. Free searchable PDF, nothing uploaded.",
+    "kind": "quote",
+    "description": "Quote cleaning work fast with recurring visit and deep-clean lines prefilled. Free searchable PDF, nothing uploaded.",
     "prefilledItems": [
       { "description": "Weekly office clean (visits)", "qty": 4, "unitPrice": 180, "taxRate": 0 },
       { "description": "Deep clean — kitchen & floors", "qty": 1, "unitPrice": 320, "taxRate": 0 },
@@ -170,12 +170,12 @@
     ],
     "faq": [
       {
-        "question": "Can I bill weekly and monthly on one invoice?",
+        "question": "Can I quote weekly and monthly on one estimate?",
         "answer": "Yes. Combine recurring visits and one-off deep cleans as separate line items."
       },
       {
         "question": "Can I save my business details?",
-        "answer": "Yes. In the editor you can remember your issuer profile on this device for the next invoice."
+        "answer": "Yes. In the editor you can remember your issuer profile on this device for the next quote."
       },
       {
         "question": "Is CSV export available?",
@@ -184,11 +184,11 @@
     ]
   },
   {
-    "title": "Plumbing Invoice Template",
+    "title": "Plumbing Quote Template",
     "slug": "plumbing-invoice",
     "industry": "Plumbing",
-    "kind": "invoice",
-    "description": "Create a plumbing invoice PDF with call-out, labour, and parts lines already filled. Edit on site and download free.",
+    "kind": "quote",
+    "description": "Create a plumbing quote PDF with call-out, labour, and parts lines already filled. Edit on site and download free.",
     "prefilledItems": [
       { "description": "Service call-out", "qty": 1, "unitPrice": 95, "taxRate": 0 },
       { "description": "Labour (hours)", "qty": 2.5, "unitPrice": 110, "taxRate": 0 },
@@ -197,7 +197,7 @@
     "faq": [
       {
         "question": "Can I use decimal hours for labour?",
-        "answer": "Yes. Quantity accepts decimals so 2.5 hours bills correctly."
+        "answer": "Yes. Quantity accepts decimals so 2.5 hours quotes correctly."
       },
       {
         "question": "Can I add emergency or after-hours rates?",
@@ -210,11 +210,11 @@
     ]
   },
   {
-    "title": "Electrician Invoice Template",
+    "title": "Electrician Quote Template",
     "slug": "electrician-invoice",
     "industry": "Electrical",
-    "kind": "invoice",
-    "description": "Free electrician invoice template with inspection, labour, and materials lines. Customize and export a clean A4 PDF.",
+    "kind": "quote",
+    "description": "Free electrician quote template with inspection, labour, and materials lines. Customize and export a clean A4 PDF.",
     "prefilledItems": [
       { "description": "Electrical safety inspection", "qty": 1, "unitPrice": 220, "taxRate": 0 },
       { "description": "Labour (hours)", "qty": 4, "unitPrice": 125, "taxRate": 0 },
@@ -226,12 +226,12 @@
         "answer": "Put certificate or licence numbers in the notes field or issuer tax ID so they print on the PDF."
       },
       {
-        "question": "Can I invoice commercial and residential differently?",
+        "question": "Can I quote commercial and residential differently?",
         "answer": "Yes. Start from this template and adjust rates and descriptions per job type."
       },
       {
         "question": "Is MakeFastQuote only for freelancers?",
-        "answer": "No. Trades, agencies, and solo operators all use the same invoice and proposal editor."
+        "answer": "No. Trades, agencies, and solo operators all use the same quote and proposal editor."
       }
     ]
   },
@@ -239,7 +239,7 @@
     "title": "Copywriting Quote Template",
     "slug": "copywriting-quote",
     "industry": "Copywriting",
-    "kind": "proposal",
+    "kind": "quote",
     "description": "Quote copywriting projects with research, drafts, and revisions prefilled. Free PDF proposal generator — no account.",
     "prefilledItems": [
       { "description": "Discovery & messaging brief", "qty": 1, "unitPrice": 400, "taxRate": 0 },
@@ -262,11 +262,11 @@
     ]
   },
   {
-    "title": "Video Production Invoice Template",
+    "title": "Video Production Quote Template",
     "slug": "video-production-invoice",
     "industry": "Video production",
-    "kind": "invoice",
-    "description": "Invoice video shoots with production day, editing, and licensing lines ready. Free A4 PDF with live preview.",
+    "kind": "quote",
+    "description": "Quote video shoots with production day, editing, and licensing lines ready. Free A4 PDF with live preview.",
     "prefilledItems": [
       { "description": "Production day (crew + camera)", "qty": 1, "unitPrice": 2800, "taxRate": 0 },
       { "description": "Edit & colour grade", "qty": 1, "unitPrice": 1600, "taxRate": 0 },
@@ -274,8 +274,8 @@
     ],
     "faq": [
       {
-        "question": "Can I split deposit and final invoice?",
-        "answer": "Create two documents — one deposit invoice and one final — or note the deposit in the current invoice."
+        "question": "Can I split a deposit and a later quote?",
+        "answer": "Create two documents — a deposit quote and a revised estimate — or note the deposit in the current quote."
       },
       {
         "question": "Can I bill for revisions?",
@@ -314,11 +314,11 @@
     ]
   },
   {
-    "title": "Tutoring Invoice Template",
+    "title": "Tutoring Quote Template",
     "slug": "tutoring-invoice",
     "industry": "Education",
-    "kind": "invoice",
-    "description": "Bill tutoring sessions with lesson and materials lines prefilled. Free invoice PDF generator for tutors and coaches.",
+    "kind": "quote",
+    "description": "Quote tutoring sessions with lesson and materials lines prefilled. Free quote PDF generator for tutors and coaches.",
     "prefilledItems": [
       { "description": "One-to-one lessons (hours)", "qty": 8, "unitPrice": 55, "taxRate": 0 },
       { "description": "Homework pack / materials", "qty": 1, "unitPrice": 40, "taxRate": 0 },
@@ -326,8 +326,8 @@
     ],
     "faq": [
       {
-        "question": "Can I invoice parents monthly?",
-        "answer": "Yes. Set quantity to the number of hours or sessions in the billing period."
+        "question": "Can I quote parents monthly?",
+        "answer": "Yes. Set quantity to the number of hours or sessions in the period."
       },
       {
         "question": "Can I offer package discounts?",
@@ -343,7 +343,7 @@
     "title": "Wedding Photography Quote Template",
     "slug": "wedding-photography-quote",
     "industry": "Wedding photography",
-    "kind": "proposal",
+    "kind": "quote",
     "description": "Quote wedding photography packages with coverage, second shooter, and album lines ready to customize and export.",
     "prefilledItems": [
       { "description": "Wedding day coverage (10 hours)", "qty": 1, "unitPrice": 3200, "taxRate": 0 },
@@ -354,15 +354,15 @@
     "faq": [
       {
         "question": "Can couples treat this as a contract?",
-        "answer": "Add your booking terms in notes. For a signed agreement, combine this PDF with your usual contract process."
+        "answer": "Add your booking terms in notes. For a signed agreement, combine this PDF with your usual contract process. Tax invoices should be issued separately."
       },
       {
         "question": "Can I offer package tiers?",
         "answer": "Duplicate the page flow in the editor or create separate quotes for classic, plus, and premium packages."
       },
       {
-        "question": "Can I take a deposit on a separate invoice?",
-        "answer": "Yes. Send a deposit invoice now and a final invoice later from the same editor."
+        "question": "Can I take a deposit on a separate quote?",
+        "answer": "Yes. Send a deposit quote now and a revised estimate later from the same editor."
       }
     ]
   },
@@ -370,7 +370,7 @@
     "title": "Handyman Estimate Template",
     "slug": "handyman-estimate",
     "industry": "Home services",
-    "kind": "proposal",
+    "kind": "estimate",
     "description": "Give homeowners a clear handyman estimate PDF with labour and materials lines prefilled. Free, fast, and private.",
     "prefilledItems": [
       { "description": "Job assessment visit", "qty": 1, "unitPrice": 60, "taxRate": 0 },
@@ -379,8 +379,8 @@
     ],
     "faq": [
       {
-        "question": "Can I convert the estimate to an invoice after the job?",
-        "answer": "Yes. Open the editor, switch the document type to invoice, and adjust any final quantities."
+        "question": "Can I revise the estimate after the job?",
+        "answer": "Yes. Drafts stay editable. Save as a new revision (for example 101-v2) when quantities change. Official tax invoices are issued separately."
       },
       {
         "question": "Can I list multiple small tasks?",

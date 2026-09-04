@@ -1,8 +1,9 @@
-export type DocKind = 'proposal' | 'invoice';
+export type DocKind = 'quote' | 'estimate' | 'proposal' | 'proforma';
 
 export type TemplateId = 'standard' | 'modern' | 'minimalist' | 'classic';
 
-export type DocStatus = 'draft' | 'sent' | 'paid';
+/** Pre-sale proposal states. Legacy `paid` migrates to `accepted`. */
+export type DocStatus = 'draft' | 'sent' | 'viewed' | 'accepted' | 'declined' | 'expired';
 
 export type LogoAlign = 'left' | 'center' | 'right';
 
@@ -50,6 +51,8 @@ export interface DocumentState {
   template: TemplateId;
   currency: string;
   reference: string;
+  /** Starts at 1. Displayed as `{reference}-v2` when greater than 1. */
+  revision: number;
   issueDate: string;
   dueDate: string;
   status: DocStatus;

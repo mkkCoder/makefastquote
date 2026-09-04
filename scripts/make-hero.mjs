@@ -57,13 +57,14 @@ const server = createServer(async (req, res) => {
 
 const port = await new Promise((r) => server.listen(0, () => r(server.address().port)));
 
-/** A believable freelance invoice — not lorem, not a joke. */
+/** A believable freelance quote — not lorem, not a joke. */
 const SEED = {
-  version: 1,
-  kind: 'invoice',
+  version: 3,
+  kind: 'quote',
   template: 'modern',
   currency: 'USD',
   reference: '2026-014',
+  revision: 1,
   issueDate: '2026-09-01',
   dueDate: '2026-10-01',
   issuer: {
@@ -85,7 +86,7 @@ const SEED = {
     { id: 'b', qty: 14, description: 'Packaging design (hours)', unitPrice: 95, taxRate: 0 },
     { id: 'c', qty: 1, description: 'Print-ready artwork', unitPrice: 350, taxRate: 0 },
   ],
-  notes: 'Payment due within 30 days.',
+  notes: 'Official tax invoices will be issued separately upon payment or project completion.',
   discount: 0,
   logo: null,
   signature: [],
@@ -136,7 +137,7 @@ if (svg.includes('Made with')) {
 svg = svg
   .replace(/\swidth="100%"/, '')
   .replace(/\sstyle="[^"]*"/, '')
-  .replace('<svg ', '<svg class="doc" role="img" aria-label="An example invoice produced by the tool" ');
+  .replace('<svg ', '<svg class="doc" role="img" aria-label="An example quote produced by the tool" ');
 
 const html = await readFile(indexPath, 'utf8');
 const a = html.indexOf(START);

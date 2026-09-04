@@ -92,6 +92,7 @@ export function FormPanel() {
   const setSignature = useApp((s) => s.setSignature);
   const setSignatureImage = useApp((s) => s.setSignatureImage);
   const rememberProfile = useApp((s) => s.rememberProfile);
+  const saveRevision = useApp((s) => s.saveRevision);
   const openUpgrade = useApp((s) => s.openUpgrade);
 
   return (
@@ -181,7 +182,7 @@ export function FormPanel() {
             <span>
               <span className="font-semibold">Remove footer credit</span>
               <span className="block text-xs text-muted mt-0.5">
-                Hide “Made with makefastquote.com” on exported PDFs.
+                Hide “Made with makefastquote.com”. The legal quotation disclaimer always prints.
               </span>
             </span>
           </label>
@@ -233,7 +234,7 @@ export function FormPanel() {
       <Section title="Document">
         <div className="grid sm:grid-cols-2 gap-3">
           <Field
-            label="Reference"
+            label="Quote number"
             value={doc.reference}
             onChange={(v) => patchDoc({ reference: v })}
             placeholder="2026-001"
@@ -256,17 +257,27 @@ export function FormPanel() {
             </select>
           </div>
           <Field
-            label={doc.kind === 'invoice' ? 'Issue date' : 'Date'}
+            label="Date"
             type="date"
             value={doc.issueDate}
             onChange={(v) => patchDoc({ issueDate: v })}
           />
           <Field
-            label={doc.kind === 'invoice' ? 'Due date' : 'Valid until'}
+            label="Valid until"
             type="date"
             value={doc.dueDate}
             onChange={(v) => patchDoc({ dueDate: v })}
           />
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <p className="text-xs text-muted">
+            Revision v{Math.max(1, doc.revision || 1)}
+            {doc.revision > 1 ? ` · prints as ${doc.reference || '—'}-v${doc.revision}` : ''}. Drafts
+            stay fully editable.
+          </p>
+          <button type="button" className="btn btn-ghost text-xs" onClick={saveRevision}>
+            Save as new revision
+          </button>
         </div>
       </Section>
 
@@ -275,12 +286,8 @@ export function FormPanel() {
       </Section>
 
       <Section
-        title="Payment / banking"
-        hint={
-          doc.kind === 'invoice'
-            ? 'IBAN, SWIFT, and the terms that sit under the total.'
-            : 'Scope, schedule, how long the quote stands.'
-        }
+        title="Notes & terms"
+        hint="Scope, validity, and how official tax invoices are issued later."
       >
         <Field
           label="Bank details"
@@ -291,21 +298,21 @@ export function FormPanel() {
         />
         <div className="mt-3">
           <label className="label" htmlFor="notes-terms">
-            {doc.kind === 'invoice' ? 'Payment terms' : 'Notes & terms'}
+            Notes & terms
           </label>
           <textarea
             id="notes-terms"
             dir="auto"
             className="field resize-y min-h-[6rem]"
             value={doc.notes}
-            placeholder={
-              doc.kind === 'invoice'
-                ? 'Payment due within 30 days.'
-                : 'This proposal is valid for 30 days. 50% due on acceptance.'
-            }
+            placeholder="Official tax invoices will be issued separately upon payment or project completion."
             onChange={(e) => patchDoc({ notes: e.target.value })}
             aria-label="Notes and terms"
           />
+          <p className="text-[11px] text-faint mt-1.5 leading-snug">
+            A legal disclaimer also prints in the footer of every preview and PDF. It cannot be
+            removed.
+          </p>
         </div>
       </Section>
 

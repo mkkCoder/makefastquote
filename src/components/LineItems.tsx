@@ -175,7 +175,7 @@ export function LineItems() {
           </div>
         ))}
         <div className="flex justify-between font-bold text-base pt-1.5 border-t border-edge">
-          <span>{doc.kind === 'invoice' ? 'Total due' : 'Total'}</span>
+          <span>Total</span>
           <span className="tabular-nums" data-testid="grand-total">
             {formatMoney(totals.total, doc.currency)}
           </span>

@@ -9,7 +9,7 @@ import { downloadBlob } from '../lib/exportData';
 import { IconCheck, IconSparkle, IconX } from './Icons';
 
 const BENEFITS = [
-  ['Your logo on every document', 'Upload once. It sits in the header of every proposal and invoice you send.'],
+  ['Your logo on every document', 'Upload once. It sits in the header of every quote and proposal you send.'],
   ['Three studio templates', 'Modern, Minimalist and Classic — different enough that clients notice.'],
   ['Your colour, no footer credit', 'Brand the table and totals. The document is yours end to end.'],
 ] as const;

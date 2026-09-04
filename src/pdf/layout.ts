@@ -6,6 +6,7 @@ import { visualOrder, paragraphDirFor, needsUnicodeFont } from './unicodeFont';
 import { SITE } from '../config';
 import { clampScale } from '../lib/logo';
 import { isHexColor, mixHex } from '../lib/color';
+import { LEGAL_DISCLAIMER, displayReference, kindLabel } from '../lib/quote';
 
 /**
  * THE SINGLE SOURCE OF LAYOUT TRUTH.
@@ -17,7 +18,7 @@ import { isHexColor, mixHex } from '../lib/color';
  * That is the whole reason the preview can be trusted. The usual approach —
  * style a DOM node, then screenshot it into a PDF — gives you two renderers
  * with two layout engines and a PDF whose text is a picture of text: not
- * selectable, not searchable, several megabytes. On an invoice that means the
+ * selectable, not searchable, several megabytes. On a quote that means the
  * client cannot copy your bank details or your reference number.
  *
  * If you add a visual feature, add it here, once. Never draw directly in
@@ -120,8 +121,8 @@ function documentNeedsUnicode(doc: DocumentState): boolean {
 
 function labels(kind: DocumentState['kind']) {
   return {
-    title: kind === 'invoice' ? 'Invoice' : 'Proposal',
-    billTo: kind === 'invoice' ? 'Bill to' : 'Prepared for',
+    title: kindLabel(kind),
+    billTo: 'Prepared for',
     description: 'Description',
     qty: 'Qty',
     unit: 'Unit',
@@ -130,12 +131,12 @@ function labels(kind: DocumentState['kind']) {
     subtotal: 'Subtotal',
     discount: (n: string) => `Discount (${n}%)`,
     taxLine: (n: string) => `Tax ${n}%`,
-    total: kind === 'invoice' ? 'Total due' : 'Total',
-    notes: kind === 'invoice' ? 'Payment terms' : 'Notes & terms',
+    total: 'Total',
+    notes: 'Notes & terms',
     empty: 'No line items yet.',
     reference: 'Reference',
-    issued: kind === 'invoice' ? 'Issued' : 'Date',
-    due: kind === 'invoice' ? 'Due' : 'Valid until',
+    issued: 'Date',
+    due: 'Valid until',
     taxId: (id: string) => `Tax ID ${id}`,
   };
 }
@@ -226,7 +227,7 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
   });
 
   const meta: Array<[string, string]> = [
-    [L.reference, doc.reference || '—'],
+    [L.reference, displayReference(doc)],
     [L.issued, doc.issueDate || '—'],
     [L.due, doc.dueDate || '—'],
   ];
@@ -329,7 +330,9 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
 
   const ROW_MIN_H = 7;
   const HEAD_H = 8;
-  const FOOTER_RESERVE = 14;
+  const disclaimerLines = wrap(LEGAL_DISCLAIMER, CONTENT_W, 6.2);
+  const DISCLAIMER_LINE_H = 3.35;
+  const FOOTER_RESERVE = 10 + disclaimerLines.length * DISCLAIMER_LINE_H;
 
   const drawTableHead = () => {
     if (tpl.headFill) {
@@ -555,9 +558,22 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
   // and no server bill. Spend zero hours on obfuscation; the people who would
   // bypass it were never going to pay $29.
 
-  const footerY = PAGE.h - MARGIN.bottom + 6;
+  const footerY = PAGE.h - MARGIN.bottom + 7;
+  const discStart = PAGE.h - MARGIN.bottom - disclaimerLines.length * DISCLAIMER_LINE_H + 2;
   pages.forEach((page, i) => {
     const pageOps = page.ops;
+    disclaimerLines.forEach((line, li) => {
+      pageOps.push({
+        t: 'text',
+        x: MARGIN.left,
+        y: discStart + li * DISCLAIMER_LINE_H,
+        text: visualOrder(line, paragraphDirFor(line)),
+        size: 6.2,
+        weight: 'normal',
+        color: tpl.muted,
+        align: 'left',
+      });
+    });
     if (pages.length > 1) {
       pageOps.push({
         t: 'text',
@@ -574,7 +590,8 @@ export function layoutDocument({ doc, isPro, preview = false }: LayoutInput): La
       const credit = `Made with ${SITE.domain}`;
       // Fit the credit line rather than trusting a hardcoded size: the domain
       // is a variable, and the day it gets longer this would silently overrun.
-      const size = fit(credit, 60, 7.5);
+      const creditMax = pages.length > 1 ? 70 : CONTENT_W;
+      const size = fit(credit, creditMax, 7);
       pageOps.push({
         t: 'text',
         x: MARGIN.left,

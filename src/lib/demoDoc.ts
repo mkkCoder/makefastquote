@@ -2,12 +2,13 @@ import type { DocumentState, TemplateId } from '../types';
 
 export function demoDocument(over: Partial<DocumentState> = {}): DocumentState {
   return {
-    version: 2,
+    version: 3,
     id: 'demo',
-    kind: 'invoice',
+    kind: 'quote',
     template: 'modern',
     currency: 'USD',
     reference: '2026-014',
+    revision: 1,
     issueDate: '2026-09-01',
     dueDate: '2026-10-01',
     status: 'draft',
@@ -40,7 +41,7 @@ export function demoDocument(over: Partial<DocumentState> = {}): DocumentState {
       { id: 'b', qty: 14, description: 'Packaging design (hours)', unitPrice: 95, taxRate: 0 },
       { id: 'c', qty: 1, description: 'Print-ready artwork', unitPrice: 350, taxRate: 0 },
     ],
-    notes: 'Payment due within 30 days.',
+    notes: 'Official tax invoices will be issued separately upon payment or project completion.',
     discount: 0,
     logo: null,
     logoScale: 1,

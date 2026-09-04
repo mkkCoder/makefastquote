@@ -1,11 +1,12 @@
 import type { DocumentState } from '../types';
 import { computeTotals, formatMoney } from './money';
+import { displayReference, kindLabel } from './quote';
 
 /**
  * FREE FOREVER, FOR EVERYONE. Never put this behind the paywall.
  *
  * A tool that holds someone's own data hostage feels like a trap and gets
- * talked about that way — and "you have to pay to get your own invoice data
+ * talked about that way — and "you have to pay to get your own quote data
  * out" is the single most quotable bad review a product like this can earn.
  * This is the cheapest reputation insurance available.
  */
@@ -18,10 +19,10 @@ function csvCell(value: string | number): string {
 export function toCsv(doc: DocumentState): string {
   const totals = computeTotals(doc.items, doc.discount);
   const rows: Array<Array<string | number>> = [
-    ['Document', doc.kind === 'invoice' ? 'Invoice' : 'Proposal'],
-    ['Reference', doc.reference],
-    ['Issue date', doc.issueDate],
-    [doc.kind === 'invoice' ? 'Due date' : 'Valid until', doc.dueDate],
+    ['Document', kindLabel(doc.kind)],
+    ['Quote number', displayReference(doc)],
+    ['Date', doc.issueDate],
+    ['Valid until', doc.dueDate],
     ['Currency', doc.currency],
     ['From', doc.issuer.name],
     ['From email', doc.issuer.email],
@@ -62,6 +63,7 @@ export function toJson(doc: DocumentState): string {
   const totals = computeTotals(doc.items, doc.discount);
   return JSON.stringify(
     {
+      quoteId: doc.id,
       ...doc,
       // Signature strokes are geometry, and an uploaded signature is a base64
       // PNG — neither is data anyone wants in a backup, and together they make

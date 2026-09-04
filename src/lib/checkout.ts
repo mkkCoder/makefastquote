@@ -9,7 +9,7 @@ import { CHECKOUT_URL, LEMON_JS_URL } from '../config';
  * That is the most expensive place in the entire product to lose someone.
  *
  * Layer 1  Overlay checkout — they never leave the page and their half-finished
- *          invoice stays visible behind the modal. If the success payload
+ *          quote stays visible behind the modal. If the success payload
  *          carries the key, we activate it and they never see a code at all.
  * Layer 2  Pre-opened code field, when the payload has no key.
  * Layer 3  New tab, if lemon.js cannot load (offline, ad blocker, CSP).

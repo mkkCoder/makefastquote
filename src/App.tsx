@@ -70,7 +70,7 @@ export default function App() {
     <div className="min-h-full flex flex-col">
       <Header />
       <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 py-5 pb-24 lg:pb-5">
-        <h1 className="sr-only">Invoice and proposal editor</h1>
+        <h1 className="sr-only">Quote and proposal editor</h1>
         <StorageBanners />
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,0.45fr)_minmax(0,0.55fr)] gap-5 lg:gap-6 items-start">

@@ -3,7 +3,7 @@ import type { LineItem } from '../types';
 /**
  * All money is computed in integer minor units (cents) and only converted to a
  * float at the very end. Summing floats row by row drifts: 0.1 + 0.2 is the
- * classic, but the one that actually bites an invoice is a 3-decimal tax rate
+ * classic, but the one that actually bites a quote is a 3-decimal tax rate
  * applied to twelve rows, where the printed total ends a cent off the sum of
  * the printed rows and the client queries the bill.
  */
@@ -29,7 +29,7 @@ export interface Totals {
   discount: number;
   tax: number;
   total: number;
-  /** Tax broken down by rate, so an invoice can show "VAT 20%" separately. */
+  /** Tax broken down by rate, so a quote can show "VAT 20%" separately. */
   taxByRate: Array<{ rate: number; amount: number }>;
 }
 

@@ -95,7 +95,7 @@ function jsonLd(niche) {
         url,
         image: `${SITE}/og.png`,
         applicationCategory: 'BusinessApplication',
-        applicationSubCategory: `${niche.industry} invoice and quote generator`,
+        applicationSubCategory: `${niche.industry} quote and estimate generator`,
         operatingSystem: 'Web browser',
         isAccessibleForFree: true,
         description: niche.description,
@@ -105,6 +105,7 @@ function jsonLd(niche) {
           'Live preview in the browser',
           'No account required',
           'Client-side only — documents never leave the browser',
+          'Quotation disclaimer on every PDF',
         ],
         offers: [
           {
@@ -149,7 +150,14 @@ function pageHtml(niche) {
   const desc = metaDescription(niche);
   const url = `${SITE}/${niche.slug}/`;
   const editorHref = `../app/?niche=${encodeURIComponent(niche.slug)}`;
-  const kindLabel = niche.kind === 'invoice' ? 'invoice' : 'quote / proposal';
+  const kindLabel =
+    niche.kind === 'estimate'
+      ? 'estimate'
+      : niche.kind === 'proposal'
+        ? 'proposal'
+        : niche.kind === 'proforma'
+          ? 'proforma'
+          : 'quote';
   const firstItem = niche.prefilledItems[0]?.description ?? '';
 
   return `<!doctype html>
@@ -316,7 +324,7 @@ ${jsonLd(niche)}
             <p class="lede">${esc(niche.description)}</p>
             <div class="cta-row">
               <a class="btn btn-primary" href="${editorHref}">Customize this in the editor</a>
-              <a class="btn btn-ghost" href="../">All invoice tools</a>
+              <a class="btn btn-ghost" href="../">All quote tools</a>
             </div>
             <p class="eyebrow" style="margin-top: 1.25rem">Prefilled line items</p>
             <ul class="item-list">
@@ -359,7 +367,7 @@ ${jsonLd(niche)}
 
       <section class="wrap" id="faq">
         <p class="eyebrow">FAQ</p>
-        <h2>${esc(niche.industry)} invoice and quote questions.</h2>
+        <h2>${esc(niche.industry)} quote and estimate questions.</h2>
         <div class="faq-list">
           ${faqHtml(niche)}
         </div>
@@ -371,7 +379,7 @@ ${jsonLd(niche)}
 
     <footer>
       <div class="wrap">
-        <p>MakeFastQuote — free invoice, quote, and proposal PDFs for ${esc(niche.industry.toLowerCase())} and other trades.</p>
+        <p>MakeFastQuote — free quote, estimate, and proposal PDFs for ${esc(niche.industry.toLowerCase())} and other trades. Documents are quotations, not tax invoices.</p>
         <div class="foot-links">
           <a href="../">Home</a>
           <a href="../privacy.html">Privacy</a>

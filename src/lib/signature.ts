@@ -5,7 +5,7 @@ import type { SignatureImage } from '../types';
  *
  * THE PROBLEM THIS SOLVES: people sign a piece of paper and photograph it. That
  * image has a background — white paper, a grey desk, a shadow across one
- * corner. Dropping it straight onto an invoice pastes an opaque rectangle over
+ * corner. Dropping it straight onto a quote pastes an opaque rectangle over
  * the page, and it looks exactly as bad as it sounds. Every tool that "supports
  * signature upload" without doing this produces documents with a grey box
  * floating above the signature line.
